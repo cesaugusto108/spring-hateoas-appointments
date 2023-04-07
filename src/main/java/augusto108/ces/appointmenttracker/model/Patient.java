@@ -1,5 +1,6 @@
 package augusto108.ces.appointmenttracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "tb_patient")
 public class Patient extends Person {
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "tb_patient_appointment",
