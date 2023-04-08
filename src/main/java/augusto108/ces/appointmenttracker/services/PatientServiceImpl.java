@@ -14,11 +14,6 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository repository;
 
     @Override
-    public Page<Patient> getPatients(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
-    }
-
-    @Override
     public Patient getPatient(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
@@ -26,5 +21,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public Patient savePatient(Patient patient) {
         return repository.save(patient);
+    }
+
+    @Override
+    public Page<Patient> findPatientByNameLikeOrEmailLike(String searchStr, int page, int size) {
+        return repository.findPatientByNameLikeOrEmailLike(searchStr, PageRequest.of(page, size));
     }
 }

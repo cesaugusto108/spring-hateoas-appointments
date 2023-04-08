@@ -5,6 +5,7 @@ import augusto108.ces.appointmenttracker.model.Patient;
 import augusto108.ces.appointmenttracker.model.PatientModel;
 import augusto108.ces.appointmenttracker.services.PatientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -26,13 +27,18 @@ public class PatientController {
     private final Class<PatientController> controller = PatientController.class;
     private final int defaultPage = 0;
     private final int defaultPageSize = 5;
-    private final Link aggregateRoot = linkTo(methodOn(controller).getPatients(defaultPage, defaultPageSize)).withRel("patients");
+    private final Link aggregateRoot = linkTo(methodOn(controller).getPatients("", defaultPage, defaultPageSize)).withRel("patients");
 
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<PatientModel>> getPatients(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     ) {
-        return ResponseEntity.ok(resourcesAssembler.toModel(service.getPatients(page, size), converter));
+        Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size);
+        Link self = linkTo(methodOn(controller).getPatients(search, page, size)).withSelfRel();
+
+        return ResponseEntity.ok(resourcesAssembler.toModel(patients, converter, self));
     }
 
     @GetMapping(value = "/{id}", produces = "application/hal+json")
