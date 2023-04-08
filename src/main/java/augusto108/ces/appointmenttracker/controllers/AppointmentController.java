@@ -8,12 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 
@@ -28,6 +26,11 @@ public class AppointmentController {
     private final AppointmentModelConverter converter;
     private final PagedResourcesAssembler<Appointment> pagedResourcesAssembler;
 
+    private final Class<AppointmentController> controller = AppointmentController.class;
+    private final int defaultPage = 0;
+    private final int defaultPageSize = 5;
+    private final Link aggregateRoot = linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize)).withRel("appointments");
+
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<AppointmentModel>> getAppointments(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size
@@ -37,14 +40,19 @@ public class AppointmentController {
 
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
-        Class<AppointmentController> controller = AppointmentController.class;
-        int defaultPage = 0;
-        int defaultPageSize = 5;
-
         Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
-        Link modelsLink = linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize)).withRel("appointments");
 
-        return ResponseEntity.ok(converter.toModel(service.getAppointment(id)).add(Arrays.asList(self, modelsLink)));
+        return ResponseEntity.ok(converter.toModel(service.getAppointment(id)).add(Arrays.asList(self, aggregateRoot)));
+    }
+
+    @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
+    public ResponseEntity<AppointmentModel> saveAppointment(@RequestBody Appointment appointment) {
+        final Appointment a = service.saveAppointment(appointment);
+        Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(converter.toModel(a).add(self, aggregateRoot));
     }
 }
 

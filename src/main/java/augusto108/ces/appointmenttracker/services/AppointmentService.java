@@ -7,4 +7,6 @@ public interface AppointmentService {
     Page<Appointment> getAppointments(int page, int size);
 
     Appointment getAppointment(Long id);
+
+    Appointment saveAppointment(Appointment appointment);
 }

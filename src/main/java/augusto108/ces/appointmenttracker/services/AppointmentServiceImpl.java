@@ -22,4 +22,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Appointment getAppointment(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
+
+    @Override
+    public Appointment saveAppointment(Appointment appointment) {
+        return repository.save(appointment);
+    }
 }
