@@ -76,10 +76,12 @@ public class AppointmentController {
         physicianService.savePhysician(physician);
 
         Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
+        Link confirmLink = linkTo(methodOn(controller).confirmAppointment(a.getId())).withRel("confirm");
+        Link cancelLink = linkTo(methodOn(controller).cancelAppointment(a.getId())).withRel("cancel");
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(converter.toModel(a).add(self, aggregateRoot));
+                .body(converter.toModel(a).add(self, confirmLink, cancelLink, aggregateRoot));
     }
 
     @PatchMapping(value = "/{id}/confirm", produces = "application/hal+json")
