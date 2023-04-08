@@ -3,6 +3,7 @@ package augusto108.ces.appointmenttracker.controllers;
 import augusto108.ces.appointmenttracker.converters.AppointmentModelConverter;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.AppointmentModel;
+import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -45,6 +46,7 @@ public class AppointmentController {
 
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<AppointmentModel> saveAppointment(@RequestBody Appointment appointment) {
+        appointment.setStatus(Status.PAYMENT_PENDING);
         final Appointment a = service.saveAppointment(appointment);
         Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
 
