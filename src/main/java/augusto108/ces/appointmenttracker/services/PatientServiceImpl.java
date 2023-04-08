@@ -22,4 +22,9 @@ public class PatientServiceImpl implements PatientService {
     public Patient getPatient(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
+
+    @Override
+    public Patient savePatient(Patient patient) {
+        return repository.save(patient);
+    }
 }

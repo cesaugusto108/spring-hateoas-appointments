@@ -7,4 +7,6 @@ public interface PatientService {
     Page<Patient> getPatients(int page, int size);
 
     Patient getPatient(Long id);
+
+    Patient savePatient(Patient patient);
 }
