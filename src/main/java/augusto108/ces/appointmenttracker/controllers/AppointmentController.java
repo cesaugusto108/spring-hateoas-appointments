@@ -9,6 +9,7 @@ import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
 import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
@@ -46,8 +47,14 @@ public class AppointmentController {
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
+        Link confirmLink = linkTo(methodOn(controller).confirmAppointment(id)).withRel("confirm");
 
-        return ResponseEntity.ok(converter.toModel(service.getAppointment(id)).add(self, aggregateRoot));
+        Appointment a = service.getAppointment(id);
+
+        if (a.getStatus() == Status.PAYMENT_PENDING)
+            return ResponseEntity.ok(converter.toModel(a).add(self, confirmLink, aggregateRoot));
+
+        return ResponseEntity.ok(converter.toModel(a).add(self, aggregateRoot));
     }
 
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
@@ -68,6 +75,35 @@ public class AppointmentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(converter.toModel(a).add(self, aggregateRoot));
+    }
+
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<?> confirmAppointment(@PathVariable("id") Long id) {
+        Appointment a = service.getAppointment(id);
+
+        if (a.getStatus() == Status.PAYMENT_PENDING) {
+            a.setStatus(Status.CONFIRMED);
+            Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
+
+            return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, aggregateRoot));
+        }
+
+        final NotAllowedResponse response = new NotAllowedResponse("Cannot confirm an appointment with current status: " + a.getStatus());
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
+    @Getter
+    private static class NotAllowedResponse {
+        private final String message;
+        private final HttpStatus status;
+        private final long statusCode;
+
+        public NotAllowedResponse(String message) {
+            this.message = message;
+            this.status = HttpStatus.METHOD_NOT_ALLOWED;
+            this.statusCode = status.value();
+        }
     }
 }
 
