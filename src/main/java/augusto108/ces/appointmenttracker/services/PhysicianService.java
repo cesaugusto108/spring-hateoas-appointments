@@ -7,4 +7,6 @@ public interface PhysicianService {
     Page<Physician> getPhysicians(int page, int size);
 
     Physician getPhysician(Long id);
+
+    Physician savePhysician(Physician physician);
 }

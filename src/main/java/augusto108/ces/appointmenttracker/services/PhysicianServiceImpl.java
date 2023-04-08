@@ -22,4 +22,9 @@ public class PhysicianServiceImpl implements PhysicianService {
     public Physician getPhysician(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
+
+    @Override
+    public Physician savePhysician(Physician physician) {
+        return repository.save(physician);
+    }
 }

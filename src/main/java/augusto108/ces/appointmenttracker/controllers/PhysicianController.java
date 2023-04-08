@@ -8,12 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 
@@ -28,6 +26,12 @@ public class PhysicianController {
     private final PhysicianModelConverter converter;
     private final PagedResourcesAssembler<Physician> resourcesAssembler;
 
+    private final Class<PhysicianController> controller = PhysicianController.class;
+    private final int defaultPage = 0;
+    private final int defaultPageSize = 5;
+    private final Link aggregateRoot = linkTo(methodOn(controller).getPhysicians(defaultPage, defaultPageSize)).withRel("physicians");
+
+
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<PhysicianModel>> getPhysicians(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size
@@ -37,13 +41,18 @@ public class PhysicianController {
 
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<PhysicianModel> getPhysicianById(@PathVariable("id") Long id) {
-        Class<PhysicianController> controller = PhysicianController.class;
-        int defaultPage = 0;
-        int defaultPageSize = 5;
-
         Link self = linkTo(methodOn(controller).getPhysicianById(id)).withSelfRel();
-        Link modelsLink = linkTo(methodOn(controller).getPhysicians(defaultPage, defaultPageSize)).withRel("physicians");
 
-        return ResponseEntity.ok(converter.toModel(service.getPhysician(id)).add(Arrays.asList(self, modelsLink)));
+        return ResponseEntity.ok(converter.toModel(service.getPhysician(id)).add(self, aggregateRoot));
+    }
+
+    @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
+    public ResponseEntity<PhysicianModel> savePhysician(@RequestBody Physician physician) {
+        final Physician p = service.savePhysician(physician);
+        Link self = linkTo(methodOn(controller).getPhysicianById(p.getId())).withSelfRel();
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(converter.toModel(p).add(self, aggregateRoot));
     }
 }
