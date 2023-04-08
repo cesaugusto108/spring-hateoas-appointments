@@ -48,11 +48,16 @@ public class AppointmentController {
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
         Link confirmLink = linkTo(methodOn(controller).confirmAppointment(id)).withRel("confirm");
+        Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
+        Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
 
         Appointment a = service.getAppointment(id);
 
         if (a.getStatus() == Status.PAYMENT_PENDING)
-            return ResponseEntity.ok(converter.toModel(a).add(self, confirmLink, aggregateRoot));
+            return ResponseEntity.ok(converter.toModel(a).add(self, confirmLink, cancelLink, aggregateRoot));
+
+        if (a.getStatus() == Status.CONFIRMED)
+            return ResponseEntity.ok(converter.toModel(a).add(self, finishLink, cancelLink, aggregateRoot));
 
         return ResponseEntity.ok(converter.toModel(a).add(self, aggregateRoot));
     }
@@ -77,18 +82,52 @@ public class AppointmentController {
                 .body(converter.toModel(a).add(self, aggregateRoot));
     }
 
-    @PatchMapping("/{id}/confirm")
+    @PatchMapping(value = "/{id}/confirm", produces = "application/hal+json")
     public ResponseEntity<?> confirmAppointment(@PathVariable("id") Long id) {
         Appointment a = service.getAppointment(id);
 
         if (a.getStatus() == Status.PAYMENT_PENDING) {
             a.setStatus(Status.CONFIRMED);
             Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
+            Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
+            Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
+
+            return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, finishLink, cancelLink, aggregateRoot));
+        }
+
+        final NotAllowedResponse response = new NotAllowedResponse("Cannot confirm an appointment with current status: " + a.getStatus());
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
+    @PatchMapping(value = "/{id}/finish", produces = "application/hal+json")
+    public ResponseEntity<?> finishAppointment(@PathVariable("id") Long id) {
+        Appointment a = service.getAppointment(id);
+
+        if (a.getStatus() == Status.CONFIRMED) {
+            a.setStatus(Status.FINISHED);
+            Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
 
             return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, aggregateRoot));
         }
 
-        final NotAllowedResponse response = new NotAllowedResponse("Cannot confirm an appointment with current status: " + a.getStatus());
+        final NotAllowedResponse response = new NotAllowedResponse("Cannot finish an appointment with current status: " + a.getStatus());
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
+    @PatchMapping(value = "/{id}/cancel", produces = "application/hal+json")
+    public ResponseEntity<?> cancelAppointment(@PathVariable("id") Long id) {
+        Appointment a = service.getAppointment(id);
+
+        if (a.getStatus() == Status.PAYMENT_PENDING || a.getStatus() == Status.CONFIRMED) {
+            a.setStatus(Status.CANCELLED);
+            Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
+
+            return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, aggregateRoot));
+        }
+
+        final NotAllowedResponse response = new NotAllowedResponse("Cannot cancel an appointment with current status: " + a.getStatus());
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
