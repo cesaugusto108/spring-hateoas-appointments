@@ -1,5 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
+import augusto108.ces.appointmenttracker.exceptions.EntityNotFoundException;
 import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.repositories.PhysicianRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,6 @@ public class PhysicianServiceImpl implements PhysicianService {
 
     @Override
     public Physician getPhysician(Long id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
 }

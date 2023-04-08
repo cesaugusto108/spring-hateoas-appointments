@@ -1,5 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
+import augusto108.ces.appointmenttracker.exceptions.EntityNotFoundException;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Appointment getAppointment(Long id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
 }
