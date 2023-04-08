@@ -3,8 +3,12 @@ package augusto108.ces.appointmenttracker.controllers;
 import augusto108.ces.appointmenttracker.converters.AppointmentModelConverter;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.AppointmentModel;
+import augusto108.ces.appointmenttracker.model.Patient;
+import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
+import augusto108.ces.appointmenttracker.services.PatientService;
+import augusto108.ces.appointmenttracker.services.PhysicianService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
@@ -22,6 +26,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequiredArgsConstructor
 public class AppointmentController {
     private final AppointmentService service;
+    private final PatientService patientService;
+    private final PhysicianService physicianService;
     private final AppointmentModelConverter converter;
     private final PagedResourcesAssembler<Appointment> pagedResourcesAssembler;
 
@@ -48,6 +54,15 @@ public class AppointmentController {
     public ResponseEntity<AppointmentModel> saveAppointment(@RequestBody Appointment appointment) {
         appointment.setStatus(Status.PAYMENT_PENDING);
         final Appointment a = service.saveAppointment(appointment);
+
+        Patient patient = patientService.getPatient(a.getPatient().getId());
+        patient.getAppointments().add(a);
+        patientService.savePatient(patient);
+
+        Physician physician = physicianService.getPhysician(a.getPhysician().getId());
+        physician.getAppointments().add(a);
+        physicianService.savePhysician(physician);
+
         Link self = linkTo(methodOn(controller).getAppointmentById(a.getId())).withSelfRel();
 
         return ResponseEntity
