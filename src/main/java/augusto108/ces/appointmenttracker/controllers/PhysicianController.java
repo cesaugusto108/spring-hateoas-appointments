@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -30,7 +28,6 @@ public class PhysicianController {
     private final int defaultPage = 0;
     private final int defaultPageSize = 5;
     private final Link aggregateRoot = linkTo(methodOn(controller).getPhysicians(defaultPage, defaultPageSize)).withRel("physicians");
-
 
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<PhysicianModel>> getPhysicians(
