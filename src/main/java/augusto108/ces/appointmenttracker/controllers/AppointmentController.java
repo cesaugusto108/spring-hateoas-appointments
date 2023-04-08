@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -42,7 +40,7 @@ public class AppointmentController {
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
 
-        return ResponseEntity.ok(converter.toModel(service.getAppointment(id)).add(Arrays.asList(self, aggregateRoot)));
+        return ResponseEntity.ok(converter.toModel(service.getAppointment(id)).add(self, aggregateRoot));
     }
 
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
