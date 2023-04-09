@@ -11,6 +11,7 @@ import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -35,13 +36,18 @@ public class AppointmentController {
     private final Class<AppointmentController> controller = AppointmentController.class;
     private final int defaultPage = 0;
     private final int defaultPageSize = 5;
-    private final Link aggregateRoot = linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize)).withRel("appointments");
+    private final Link aggregateRoot = linkTo(methodOn(controller).getAppointments("", defaultPage, defaultPageSize)).withRel("appointments");
 
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<AppointmentModel>> getAppointments(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     ) {
-        return ResponseEntity.ok(pagedResourcesAssembler.toModel(service.getAppointments(page, size), converter));
+        Link self = linkTo(methodOn(controller).getAppointments(search, page, size)).withSelfRel();
+        Page<Appointment> appointments = service.findAppointmentByStatusOrPersonName(search, page, size);
+
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(appointments, converter, self));
     }
 
     @GetMapping(value = "/{id}", produces = "application/hal+json")

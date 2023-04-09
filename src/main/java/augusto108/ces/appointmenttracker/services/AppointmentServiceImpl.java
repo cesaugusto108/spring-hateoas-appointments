@@ -14,11 +14,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository repository;
 
     @Override
-    public Page<Appointment> getAppointments(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
-    }
-
-    @Override
     public Appointment getAppointment(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
@@ -26,5 +21,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment saveAppointment(Appointment appointment) {
         return repository.save(appointment);
+    }
+
+    @Override
+    public Page<Appointment> findAppointmentByStatusOrPersonName(String search, int page, int size) {
+        return repository.findAppointmentByStatusOrPersonName(search, PageRequest.of(page, size));
     }
 }
