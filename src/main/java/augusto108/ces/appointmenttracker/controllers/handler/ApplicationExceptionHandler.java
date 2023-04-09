@@ -27,7 +27,7 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException e) {
-        final String errorMessage = "Wrong id format. Should be a number: " + e.getMessage();
+        final String errorMessage = "Wrong property format: " + e.getMessage();
         ErrorResponse response = new ErrorResponse(e.toString(), errorMessage, HttpStatus.BAD_REQUEST);
 
         return ResponseEntity
