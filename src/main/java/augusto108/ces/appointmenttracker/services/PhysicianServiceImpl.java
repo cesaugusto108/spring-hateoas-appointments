@@ -14,11 +14,6 @@ public class PhysicianServiceImpl implements PhysicianService {
     private final PhysicianRepository repository;
 
     @Override
-    public Page<Physician> getPhysicians(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
-    }
-
-    @Override
     public Physician getPhysician(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found. Id: " + id));
     }
@@ -26,5 +21,10 @@ public class PhysicianServiceImpl implements PhysicianService {
     @Override
     public Physician savePhysician(Physician physician) {
         return repository.save(physician);
+    }
+
+    @Override
+    public Page<Physician> findPhysicianByNameLikeOrSpecialtyLike(String search, int page, int size) {
+        return repository.findPhysicianByNameLikeOrSpecialtyLike(search, PageRequest.of(page, size));
     }
 }

@@ -4,9 +4,9 @@ import augusto108.ces.appointmenttracker.model.Physician;
 import org.springframework.data.domain.Page;
 
 public interface PhysicianService {
-    Page<Physician> getPhysicians(int page, int size);
-
     Physician getPhysician(Long id);
 
     Physician savePhysician(Physician physician);
+
+    Page<Physician> findPhysicianByNameLikeOrSpecialtyLike(String search, int page, int size);
 }
