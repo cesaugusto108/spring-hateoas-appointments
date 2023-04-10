@@ -6,12 +6,20 @@ import augusto108.ces.appointmenttracker.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository repository;
+
+    @Override
+    public Page<Appointment> findAll(int page, int size, Sort.Direction direction, String field) {
+        Sort sortCriteria = Sort.by(direction, field);
+
+        return repository.findAll(PageRequest.of(page, size, sortCriteria));
+    }
 
     @Override
     public Appointment getAppointment(Long id) {
@@ -24,7 +32,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public Page<Appointment> findAppointmentByStatusOrPersonName(String search, int page, int size) {
-        return repository.findAppointmentByStatusOrPersonName(search, PageRequest.of(page, size));
+    public Page<Appointment> findAppointmentByStatusOrPersonName(String search, int page, int size, Sort.Direction direction, String field) {
+        Sort sortCriteria = Sort.by(direction, field);
+
+        return repository.findAppointmentByStatusOrPersonName(search, PageRequest.of(page, size, sortCriteria));
     }
 }
