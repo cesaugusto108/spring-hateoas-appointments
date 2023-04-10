@@ -1,12 +1,15 @@
 package augusto108.ces.appointmenttracker.controllers;
 
+import augusto108.ces.appointmenttracker.assemblers.PhysicianEntityModelAssembler;
 import augusto108.ces.appointmenttracker.converters.PhysicianModelConverter;
 import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.PhysicianModel;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -24,22 +27,37 @@ public class PhysicianController {
     private final PhysicianService service;
     private final PhysicianModelConverter converter;
     private final PagedResourcesAssembler<Physician> resourcesAssembler;
+    private final PhysicianEntityModelAssembler modelAssembler;
 
     private final Class<PhysicianController> controller = PhysicianController.class;
     private final int defaultPage = 0;
     private final int defaultPageSize = 5;
-    private final Link aggregateRoot = linkTo(methodOn(controller).getPhysicians("", defaultPage, defaultPageSize)).withRel("physicians");
+    private final Link aggregateRoot =
+            linkTo(methodOn(controller).getPhysicians(defaultPage, defaultPageSize, Sort.Direction.ASC, "id")).withRel("physicians");
 
     @GetMapping(value = "", produces = "application/hal+json")
-    public ResponseEntity<PagedModel<PhysicianModel>> getPhysicians(
+    public ResponseEntity<PagedModel<EntityModel<Physician>>> getPhysicians(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String field
+    ) {
+        Page<Physician> physicians = service.findAll(page, size, direction, field);
+
+        return ResponseEntity.ok(resourcesAssembler.toModel(physicians, modelAssembler));
+    }
+
+    @GetMapping(value = "/search", produces = "application/hal+json")
+    public ResponseEntity<PagedModel<EntityModel<Physician>>> searchPhysicians(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String field
     ) {
-        Link self = linkTo(methodOn(controller).getPhysicians(search, page, size)).withSelfRel();
-        Page<Physician> physicians = service.findPhysicianByNameLikeOrSpecialtyLike(search, page, size);
+        Page<Physician> physicians = service.findPhysicianByNameLikeOrSpecialtyLike(search, page, size, direction, field);
 
-        return ResponseEntity.ok(resourcesAssembler.toModel(physicians, converter, self));
+        return ResponseEntity.ok(resourcesAssembler.toModel(physicians, modelAssembler));
     }
 
     @GetMapping(value = "/{id}", produces = "application/hal+json")
