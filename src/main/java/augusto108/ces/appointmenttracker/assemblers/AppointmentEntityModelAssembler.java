@@ -27,15 +27,15 @@ public class AppointmentEntityModelAssembler implements RepresentationModelAssem
         final Link finish = linkTo(methodOn(AppointmentController.class).finishAppointment(entity.getId())).withRel("finish");
 
         final List<Link> commonLinks = Arrays.asList(self, appointments, search);
+        final List<Link> paymentPendingLinks = Arrays.asList(self, confirm, cancel, appointments, search);
+        final List<Link> confirmedLinks = Arrays.asList(self, cancel, finish, appointments, search);
 
         if (entity.getStatus() == Status.PAYMENT_PENDING) {
-            commonLinks.add(confirm);
-            commonLinks.add(cancel);
+            return EntityModel.of(entity, paymentPendingLinks);
         }
 
         if (entity.getStatus() == Status.CONFIRMED) {
-            commonLinks.add(cancel);
-            commonLinks.add(finish);
+            return EntityModel.of(entity, confirmedLinks);
         }
 
         return EntityModel.of(entity, commonLinks);

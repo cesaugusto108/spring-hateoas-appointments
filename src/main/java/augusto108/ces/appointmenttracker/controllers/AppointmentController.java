@@ -20,13 +20,12 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-@Controller
+@RestController
 @RequestMapping("/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
@@ -41,7 +40,8 @@ public class AppointmentController {
     private final int defaultPage = 0;
     private final int defaultPageSize = 5;
     private final Link aggregateRoot =
-            linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize, Sort.Direction.ASC, "id")).withRel("appointments");
+            linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize, Sort.Direction.ASC, "id"))
+                    .withRel("appointments");
 
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Appointment>>> getAppointments(
@@ -118,10 +118,12 @@ public class AppointmentController {
             Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
             Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
 
-            return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, finishLink, cancelLink, aggregateRoot));
+            return ResponseEntity
+                    .ok(converter.toModel(service.saveAppointment(a)).add(self, finishLink, cancelLink, aggregateRoot));
         }
 
-        final NotAllowedResponse response = new NotAllowedResponse("Cannot confirm an appointment with current status: " + a.getStatus());
+        final NotAllowedResponse response =
+                new NotAllowedResponse("Cannot confirm an appointment with current status: " + a.getStatus());
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
@@ -137,7 +139,8 @@ public class AppointmentController {
             return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, aggregateRoot));
         }
 
-        final NotAllowedResponse response = new NotAllowedResponse("Cannot finish an appointment with current status: " + a.getStatus());
+        final NotAllowedResponse response =
+                new NotAllowedResponse("Cannot finish an appointment with current status: " + a.getStatus());
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
@@ -153,7 +156,8 @@ public class AppointmentController {
             return ResponseEntity.ok(converter.toModel(service.saveAppointment(a)).add(self, aggregateRoot));
         }
 
-        final NotAllowedResponse response = new NotAllowedResponse("Cannot cancel an appointment with current status: " + a.getStatus());
+        final NotAllowedResponse response =
+                new NotAllowedResponse("Cannot cancel an appointment with current status: " + a.getStatus());
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
