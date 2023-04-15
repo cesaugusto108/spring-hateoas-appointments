@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.assemblers.AppointmentEntityModelAssembler;
+import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.converters.AppointmentModelConverter;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.AppointmentModel;
@@ -37,10 +38,10 @@ public class AppointmentController {
     private final AppointmentEntityModelAssembler modelAssembler;
 
     private final Class<AppointmentController> controller = AppointmentController.class;
-    private final int defaultPage = 0;
-    private final int defaultPageSize = 5;
+    private final DefaultParameterObj param = new DefaultParameterObj();
+
     private final Link aggregateRoot =
-            linkTo(methodOn(controller).getAppointments(defaultPage, defaultPageSize, Sort.Direction.ASC, "id"))
+            linkTo(methodOn(controller).getAppointments(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
                     .withRel("appointments");
 
     @GetMapping(value = "", produces = "application/hal+json")

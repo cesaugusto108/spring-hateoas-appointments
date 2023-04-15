@@ -1,5 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
+import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,21 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/")
+@RequiredArgsConstructor
 public class AppController {
+    private final DefaultParameterObj param = new DefaultParameterObj();
+
     @GetMapping(produces = "application/hal+json")
     public ResponseEntity<List<Link>> appIndex() {
+        final int page = param.getPage();
+        final int size = param.getSize();
+        final Sort.Direction direction = param.getDirection();
+        final String field = param.getField();
+
         Link self = linkTo(methodOn(AppController.class).appIndex()).withSelfRel();
-        Link appointments = linkTo(methodOn(AppointmentController.class).getAppointments(0, 5, Sort.Direction.ASC, "id")).withRel("appointments");
-        Link patients = linkTo(methodOn(PatientController.class).getPatients(0, 5, Sort.Direction.ASC, "id")).withRel("patients");
-        Link physicians = linkTo(methodOn(PhysicianController.class).getPhysicians(0, 5, Sort.Direction.ASC, "id")).withRel("physicians");
+        Link appointments = linkTo(methodOn(AppointmentController.class).getAppointments(page, size, direction, field)).withRel("appointments");
+        Link patients = linkTo(methodOn(PatientController.class).getPatients(page, size, direction, field)).withRel("patients");
+        Link physicians = linkTo(methodOn(PhysicianController.class).getPhysicians(page, size, direction, field)).withRel("physicians");
 
         return ResponseEntity.ok(Arrays.asList(self, appointments, patients, physicians));
     }

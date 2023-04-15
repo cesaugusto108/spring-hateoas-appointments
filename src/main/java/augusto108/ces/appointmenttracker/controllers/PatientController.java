@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.assemblers.PatientEntityModelAssembler;
+import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.converters.PatientModelConverter;
 import augusto108.ces.appointmenttracker.model.Patient;
 import augusto108.ces.appointmenttracker.model.PatientModel;
@@ -29,10 +30,10 @@ public class PatientController {
     private final PatientEntityModelAssembler modelAssembler;
 
     private final Class<PatientController> controller = PatientController.class;
-    private final int defaultPage = 0;
-    private final int defaultPageSize = 5;
+    private final DefaultParameterObj param = new DefaultParameterObj();
+
     private final Link aggregateRoot =
-            linkTo(methodOn(controller).getPatients(defaultPage, defaultPageSize, Sort.Direction.ASC, "id")).withRel("patients");
+            linkTo(methodOn(controller).getPatients(param.getPage(), param.getSize(), param.getDirection(), param.getField())).withRel("patients");
 
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Patient>>> getPatients(
