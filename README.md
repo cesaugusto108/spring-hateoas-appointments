@@ -13,29 +13,7 @@ Results are presented with pagination and sorting and with links to other pages.
 
 This application models a simple system to store information about patients, physicians and appointments.
 
-|Patient                      |
--------------------------------
-|Long id                      | 
-|String firstName             | 
-|String lastName              | 
-|String email                 | 
-|Set<Appointment> appointments| 
-
-|Physician                    |
--------------------------------
-|Long id                      |
-|String firstName             |
-|String lastName              |
-|Specialty specialty          |
-|Set<Appointment> appointments|
-
-|Appointment                  |
--------------------------------
-|Long id                      |
-|Patient patient              |
-|Physician physician          |
-|Status status                |
-
+![diagram](https://user-images.githubusercontent.com/93228693/232262918-d8ccea2f-ca09-40aa-a312-3d805892c08d.svg)
 
 ## Examples (using API's endpoints):
 - Get all appointments from database (5 per page as default):
