@@ -3,13 +3,13 @@
 
 Study project for Spring Boot, HATEOAS and Spring Data Pagination
 
-# Description
+## Description
 
 This is a Spring Boot application that works as a RESTful API. Through the endpoints of the application it is possible to send HTTP requests to fetch and save data. H2 in memory database is used.
 
 Results are presented with pagination and sorting and with links to other pages. Links serve as access to other results and to the first, current, next and last pages.
 
-# Entities model
+## Entities model
 
 This application models a simple system to store information about patients, physicians and appointments.
 
@@ -17,8 +17,8 @@ This application models a simple system to store information about patients, phy
 
 ## Examples (using API's endpoints):
 - Get all appointments from database (5 per page as default):
-HTTP request: GET
-Request URL: localhost:8089/appointments
+- HTTP request: GET
+- Request URL: localhost:8089/appointments
 
 >     curl -v localhost:8089/appointments | json_pp
 >     Trying 127.0.0.1:8089...
@@ -208,8 +208,8 @@ Request URL: localhost:8089/appointments
 >     }
 
 - Get all patients from database (5 per page as default):
-HTTP request: GET
-Request URL: localhost:8089/patients
+- HTTP request: GET
+- Request URL: localhost:8089/patients
 
 >     curl -v localhost:8089/patients | json_pp
 >     Trying 127.0.0.1:8089...
@@ -337,8 +337,8 @@ Request URL: localhost:8089/patients
 >     }
 
 - Get all physicians from database (5 per page as default):
-HTTP request: GET
-Request URL: localhost:8089/physicians
+- HTTP request: GET
+- Request URL: localhost:8089/physicians
 
 >     curl -v localhost:8089/physicians | json_pp
 >     Trying 127.0.0.1:8089...
