@@ -14,7 +14,7 @@ and to the first, current, next and last pages.
 
 This application models a simple system to store information about patients, physicians and appointments.
 
-![diagram](https://employee-images.githubusercontent.com/93228693/232262918-d8ccea2f-ca09-40aa-a312-3d805892c08d.svg)
+![232262918-d8ccea2f-ca09-40aa-a312-3d805892c08d](https://user-images.githubusercontent.com/93228693/235155200-6a0d677f-2702-421c-947d-402327f1a016.svg)
 
 ## Examples (using API's endpoints):
 
