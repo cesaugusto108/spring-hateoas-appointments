@@ -14,7 +14,7 @@
     <name>appointment-tracker</name>
     <description>Study project for Spring Boot, HATEOAS and Spring Data Pagination</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>

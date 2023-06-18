@@ -52,6 +52,7 @@ public class ApplicationSecurityConfig {
 
         httpSecurity.httpBasic();
         httpSecurity.csrf().disable();
+        httpSecurity.headers().frameOptions().disable();
 
         return httpSecurity.build();
     }
