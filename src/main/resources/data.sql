@@ -84,21 +84,3 @@ INSERT INTO tb_physician_appointment VALUES (3, 17);
 INSERT INTO tb_physician_appointment VALUES (7, 18);
 INSERT INTO tb_physician_appointment VALUES (1, 19);
 INSERT INTO tb_physician_appointment VALUES (2, 20);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -27,4 +27,9 @@ public class Physician extends Person {
     @Setter
     @Enumerated(value = EnumType.STRING)
     private Specialty specialty;
+
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName() + " (" + getSpecialty().toString() + ")";
+    }
 }
