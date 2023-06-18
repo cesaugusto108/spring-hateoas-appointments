@@ -26,4 +26,9 @@ public class Patient extends Person {
     @Setter
     @Column(name = "email", length = 100)
     private String email;
+
+    @Override
+    public String toString() {
+        return getFirstName() + " " + getLastName() + " (" + getEmail() + ")";
+    }
 }
