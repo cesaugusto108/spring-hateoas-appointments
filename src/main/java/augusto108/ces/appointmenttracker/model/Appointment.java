@@ -21,4 +21,9 @@ public class Appointment extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     private Status status;
+
+    @Override
+    public String toString() {
+        return "Patient: " + patient.toString() + " | " + "Physician: " + physician.toString() + " | " + status.toString();
+    }
 }
