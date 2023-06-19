@@ -2,31 +2,20 @@ package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
-import augusto108.ces.appointmenttracker.security.Employee;
-import augusto108.ces.appointmenttracker.services.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -37,9 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("sec")
-@Transactional
-@TestPropertySource("classpath:users.properties")
-class PhysicianControllerTest {
+class PhysicianControllerTest extends AuthorizeAdminUser {
     private MockMvc mockMvc;
 
     @Autowired
@@ -50,12 +37,6 @@ class PhysicianControllerTest {
 
     @Autowired
     private Filter springSecurityFilterChain;
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    @Value("${users.pword}")
-    private String empPassword;
 
     @BeforeEach
     void setUp() {
@@ -139,14 +120,5 @@ class PhysicianControllerTest {
                 .andExpect(jsonPath("$.firstName", is("Nelson")))
                 .andExpect(jsonPath("$.lastName", is("Muntz")))
                 .andExpect(jsonPath("$.specialty", is("ENDOCRINOLOGIST")));
-    }
-
-    private RequestPostProcessor makeAuthorizedAdminUser() {
-        final Employee employee = employeeService.findEmployeeByUsername("santos");
-
-        return SecurityMockMvcRequestPostProcessors.user(new User(
-                employee.getUsername(),
-                new BCryptPasswordEncoder().encode(empPassword),
-                List.of(new SimpleGrantedAuthority(employee.getRoles().toArray()[0].toString()))));
     }
 }
