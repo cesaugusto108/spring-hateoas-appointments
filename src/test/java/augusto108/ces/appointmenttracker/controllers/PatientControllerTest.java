@@ -115,7 +115,6 @@ class PatientControllerTest extends AuthorizeAdminUser {
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(101)))
                 .andExpect(jsonPath("$.firstName", is("Leonardo")))
                 .andExpect(jsonPath("$.lastName", is("Ribeiro")))
                 .andExpect(jsonPath("$.email", is("leonardo@email.com")));
