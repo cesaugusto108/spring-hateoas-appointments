@@ -38,7 +38,19 @@ class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
     }
 
     @Test
-    void handleNotFound() throws Exception {
+    void handleEntityNotFoundException() throws Exception {
+        mockMvc.perform(get("/appointments/{id}", 0).with(makeAuthorizedAdminUser()))
+                .andExpect(status().isNotFound())
+                .andDo(print())
+                .andExpect(jsonPath("$.status", is("NOT_FOUND")))
+                .andExpect(jsonPath("$.statusCode", is(404)));
+    }
+
+    @Test
+    void handleNoHandlerFoundException() throws Exception {
+        mockMvc.perform(get("/all").with(makeAuthorizedAdminUser()))
+                .andExpect(status().isNotFound())
+                .andDo(print());
     }
 
     @Test

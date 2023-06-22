@@ -15,23 +15,28 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApplicationExceptionHandler {
-    @ExceptionHandler({EntityNotFoundException.class, NoHandlerFoundException.class})
-    public ResponseEntity<ErrorResponse> handleNotFound(Exception e) {
-        ErrorResponse response = new ErrorResponse(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
+        return notFoundErrorResponseEntity(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
-                .body(response);
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        return notFoundErrorResponseEntity(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException e) {
         final String errorMessage = "Wrong property format: " + e.getMessage();
-        ErrorResponse response = new ErrorResponse(e.toString(), errorMessage, HttpStatus.BAD_REQUEST);
+
+        return notFoundErrorResponseEntity(e.toString(), errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    private static ResponseEntity<ErrorResponse> notFoundErrorResponseEntity(String error, String message, HttpStatus status) {
+        ErrorResponse response = new ErrorResponse(error, message, status);
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
                 .body(response);
     }
