@@ -15,13 +15,8 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApplicationExceptionHandler {
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
-        return notFoundErrorResponseEntity(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+    @ExceptionHandler({EntityNotFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
         return notFoundErrorResponseEntity(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
