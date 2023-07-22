@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.model.Patient;
+import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,9 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
     @Test
     void getPatients() throws Exception {
-        final String selfLink = "http://localhost/patients?page=0&size=20&sort=id,asc";
+        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients?page=0&size=20&sort=id,asc";
 
-        MvcResult result = mockMvc.perform(get("/patients").with(makeAuthorizedAdminUser())
+        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
                         .param("page", "0")
                         .param("size", "20")
                         .param("direction", "ASC")
@@ -70,9 +71,9 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
     @Test
     void searchPatients() throws Exception {
-        final String selfLink = "http://localhost/patients/search?page=0&size=20&sort=id,asc";
+        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients/search?page=0&size=20&sort=id,asc";
 
-        MvcResult result = mockMvc.perform(get("/patients/search").with(makeAuthorizedAdminUser())
+        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients/search").with(makeAuthorizedAdminUser())
                         .param("search", "Silva")
                         .param("page", "0")
                         .param("size", "20")
@@ -95,7 +96,7 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
     @Test
     void getPatientById() throws Exception {
-        mockMvc.perform(get("/patients/{id}", 3).with(makeAuthorizedAdminUser()))
+        mockMvc.perform(get(VersioningConstant.VERSION + "/patients/{id}", 3).with(makeAuthorizedAdminUser()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.firstName", is("Hugo")))
@@ -110,7 +111,7 @@ class PatientControllerTest extends AuthorizeAdminUser {
         patient.setLastName("Ribeiro");
         patient.setEmail("leonardo@email.com");
 
-        mockMvc.perform(post("/patients").with(makeAuthorizedAdminUser())
+        mockMvc.perform(post(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
                 .andExpect(content().contentType("application/hal+json"))

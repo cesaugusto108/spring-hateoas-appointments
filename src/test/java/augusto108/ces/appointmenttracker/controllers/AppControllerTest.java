@@ -1,5 +1,6 @@
 package augusto108.ces.appointmenttracker.controllers;
 
+import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ class AppControllerTest {
     @WithMockUser
     @Test
     void appIndex() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/"))
+        mockMvc.perform(MockMvcRequestBuilders.get(VersioningConstant.VERSION + "/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$", hasSize(4)));

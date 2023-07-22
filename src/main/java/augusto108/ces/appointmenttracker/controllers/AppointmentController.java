@@ -11,6 +11,9 @@ import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
 import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
+import augusto108.ces.appointmenttracker.util.VersioningConstant;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,8 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Tag(name = "Appointments controller", description = "Managing appointments")
 @RestController
-@RequestMapping("/appointments")
+@RequestMapping(VersioningConstant.VERSION + "/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
     private final AppointmentService service;
@@ -41,9 +45,11 @@ public class AppointmentController {
     private final DefaultParameterObj param = new DefaultParameterObj();
 
     private final Link aggregateRoot =
-            linkTo(methodOn(controller).getAppointments(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
+            linkTo(methodOn(controller)
+                    .getAppointments(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
                     .withRel("appointments");
 
+    @Operation(summary = "get appointments")
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Appointment>>> getAppointments(
             @RequestParam(defaultValue = "0") int page,
@@ -56,6 +62,7 @@ public class AppointmentController {
         return ResponseEntity.ok(resourcesAssembler.toModel(appointments, modelAssembler));
     }
 
+    @Operation(summary = "search appointments")
     @GetMapping(value = "/search", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Appointment>>> searchAppointments(
             @RequestParam(defaultValue = "") String search,
@@ -69,6 +76,7 @@ public class AppointmentController {
         return ResponseEntity.ok(resourcesAssembler.toModel(appointments, modelAssembler));
     }
 
+    @Operation(summary = "get appointment by id")
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
@@ -87,6 +95,7 @@ public class AppointmentController {
         return ResponseEntity.ok(converter.toModel(a).add(self, aggregateRoot));
     }
 
+    @Operation(summary = "save appointment")
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<AppointmentModel> saveAppointment(@RequestBody Appointment appointment) {
         appointment.setStatus(Status.PAYMENT_PENDING);
@@ -109,6 +118,7 @@ public class AppointmentController {
                 .body(converter.toModel(a).add(self, confirmLink, cancelLink, aggregateRoot));
     }
 
+    @Operation(summary = "confirm appointment")
     @PatchMapping(value = "/{id}/confirm", produces = "application/hal+json")
     public ResponseEntity<?> confirmAppointment(@PathVariable("id") Long id) {
         Appointment a = service.getAppointment(id);
@@ -129,6 +139,7 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
 
+    @Operation(summary = "finish appointment")
     @PatchMapping(value = "/{id}/finish", produces = "application/hal+json")
     public ResponseEntity<?> finishAppointment(@PathVariable("id") Long id) {
         Appointment a = service.getAppointment(id);
@@ -146,6 +157,7 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
 
+    @Operation(summary = "cancel appointment")
     @PatchMapping(value = "/{id}/cancel", produces = "application/hal+json")
     public ResponseEntity<?> cancelAppointment(@PathVariable("id") Long id) {
         Appointment a = service.getAppointment(id);

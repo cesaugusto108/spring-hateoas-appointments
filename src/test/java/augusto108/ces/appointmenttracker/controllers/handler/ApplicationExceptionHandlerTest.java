@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers.handler;
 
 import augusto108.ces.appointmenttracker.controllers.AuthorizeAdminUser;
+import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
 
     @Test
     void handleNotFoundException() throws Exception {
-        mockMvc.perform(get("/appointments/{id}", 0).with(makeAuthorizedAdminUser()))
+        mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/{id}", 0).with(makeAuthorizedAdminUser()))
                 .andExpect(status().isNotFound())
                 .andDo(print())
                 .andExpect(jsonPath("$.status", is("NOT_FOUND")))
@@ -51,7 +52,7 @@ class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
         final String error = "java.lang.NumberFormatException: For input string: \"aaa\"";
         final String message = "Wrong property format: For input string: \"aaa\"";
 
-        mockMvc.perform(get("/appointments/aaa").with(makeAuthorizedAdminUser()))
+        mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/aaa").with(makeAuthorizedAdminUser()))
                 .andExpect(status().isBadRequest())
                 .andDo(print())
                 .andExpect(jsonPath("$.error", is(String.format("%s", error))))
