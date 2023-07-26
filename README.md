@@ -5,7 +5,7 @@ Study project for Spring Boot, HATEOAS and Spring Data Pagination
 ## Description
 
 This is a Spring Boot application that works as a RESTful API. Through the endpoints of the application it is possible
-to send HTTP requests to fetch and save data. H2 in memory database is used.
+to send HTTP requests to fetch and save data. MySQL database is used.
 
 Results are presented with pagination and sorting and with links to other pages. Links serve as access to other results
 and to the first, current, next and last pages.
