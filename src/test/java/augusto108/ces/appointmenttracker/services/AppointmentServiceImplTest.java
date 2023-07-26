@@ -2,14 +2,13 @@ package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.enums.Status;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class AppointmentServiceImplTest {
     @Autowired
@@ -33,25 +33,60 @@ class AppointmentServiceImplTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @BeforeEach
+    void setUp() {
+        final String query1 = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+                "    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
+
+        final String query2 = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+                "    VALUES (2, 'Paula', 'Martins', 'paula@email.com');";
+
+        final String query3 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
+
+        final String query4 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (2, 'João', 'Cavalcante', 'DERMATOLOGIST');";
+
+        final String query5 = "INSERT INTO `tb_appointment` (`id`, `patient_id`, `physician_id`, `status`)\n" +
+                "    VALUES (1, 1, 2, 'PAYMENT_PENDING');";
+
+        final String query6 = "INSERT INTO `tb_appointment` (`id`, `patient_id`, `physician_id`, `status`)\n" +
+                "    VALUES (2, 2, 1, 'CONFIRMED');";
+
+        entityManager.createNativeQuery(query1).executeUpdate();
+        entityManager.createNativeQuery(query2).executeUpdate();
+        entityManager.createNativeQuery(query3).executeUpdate();
+        entityManager.createNativeQuery(query4).executeUpdate();
+        entityManager.createNativeQuery(query5).executeUpdate();
+        entityManager.createNativeQuery(query6).executeUpdate();
+    }
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("delete from `tb_appointment`;").executeUpdate();
+        entityManager.createNativeQuery("delete from `tb_physician`;").executeUpdate();
+        entityManager.createNativeQuery("delete from `tb_patient`;").executeUpdate();
+    }
+
     @Test
     void findAll() {
         final Page<Appointment> appointments = appointmentService.findAll(0, 20, Sort.Direction.ASC, "id");
 
-        assertEquals(20, appointments.getTotalElements());
-        assertEquals("Patient: Antonio Nunes (antonio@email.com) | " +
-                        "Physician: João Brito (DERMATOLOGIST) | " +
+        assertEquals(2, appointments.getTotalElements());
+        assertEquals("Patient: Paula Martins (paula@email.com) | " +
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
                         "CONFIRMED",
-                appointments.get().toList().get(19).toString());
+                appointments.get().toList().get(1).toString());
     }
 
     @Test
     void getAppointment() {
         final Appointment appointment = appointmentService
-                .getAppointment(1L);
+                .getAppointment(2L);
 
-        assertEquals("Patient: Pedro Cardoso (pedro@email.com) | " +
-                        "Physician: João Brito (DERMATOLOGIST) | " +
-                        "PAYMENT_PENDING",
+        assertEquals("Patient: Paula Martins (paula@email.com) | " +
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
+                        "CONFIRMED",
                 appointment.toString());
     }
 
@@ -59,7 +94,7 @@ class AppointmentServiceImplTest {
     void saveAppointment() {
         final Appointment appointment = new Appointment();
         appointment.setPatient(patientService.getPatient(2L));
-        appointment.setPhysician(physicianService.getPhysician(4L));
+        appointment.setPhysician(physicianService.getPhysician(1L));
         appointment.setStatus(Status.FINISHED);
 
         appointmentService.saveAppointment(appointment);
@@ -68,28 +103,28 @@ class AppointmentServiceImplTest {
                 .createQuery("from Appointment order by id", Appointment.class)
                 .getResultList();
 
-        assertEquals(21, appointments.size());
+        assertEquals(3, appointments.size());
         assertEquals("Patient: Paula Martins (paula@email.com) | " +
-                        "Physician: Osvaldo Pereira (CARDIOLOGIST) | " +
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
                         "FINISHED",
-                appointments.get(20).toString());
+                appointments.get(2).toString());
     }
 
     @Test
     void findAppointmentByStatusOrPersonName() {
         final Page<Appointment> appointmentsByStatus = appointmentService
-                .findAppointmentByStatusOrPersonName("FINISHED", 0, 10, Sort.Direction.ASC, "id");
+                .findAppointmentByStatusOrPersonName("CONFIRMED", 0, 10, Sort.Direction.ASC, "id");
 
-        assertEquals(5, appointmentsByStatus.getTotalElements());
-        assertEquals(3, appointmentsByStatus.get().toList().get(0).getId());
+        assertEquals(1, appointmentsByStatus.getTotalElements());
+        assertEquals(2, appointmentsByStatus.get().toList().get(0).getId());
 
         final Page<Appointment> appointmentsByPersonName = appointmentService
-                .findAppointmentByStatusOrPersonName("Pedro", 0, 10, Sort.Direction.ASC, "id");
+                .findAppointmentByStatusOrPersonName("Paula", 0, 10, Sort.Direction.ASC, "id");
 
-        assertEquals(2, appointmentsByPersonName.getTotalElements());
-        assertEquals("Patient: Pedro Cardoso (pedro@email.com) | " +
-                        "Physician: João Brito (DERMATOLOGIST) | " +
-                        "PAYMENT_PENDING",
+        assertEquals(1, appointmentsByPersonName.getTotalElements());
+        assertEquals("Patient: Paula Martins (paula@email.com) | " +
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
+                        "CONFIRMED",
                 appointmentsByPersonName.get().toList().get(0).toString());
     }
 }

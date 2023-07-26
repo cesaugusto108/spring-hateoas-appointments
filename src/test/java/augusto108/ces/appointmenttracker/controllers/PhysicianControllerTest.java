@@ -4,6 +4,7 @@ import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("sec")
+@Transactional
 class PhysicianControllerTest extends AuthorizeAdminUser {
     private MockMvc mockMvc;
 
@@ -39,12 +44,25 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
     @Autowired
     private Filter springSecurityFilterChain;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters(springSecurityFilterChain)
                 .build();
+
+        final String query = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
+
+        entityManager.createNativeQuery(query).executeUpdate();
+    }
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("delete from `tb_physician`;");
     }
 
     @Test
@@ -59,7 +77,7 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(10)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andExpect(jsonPath("$.page.totalPages", is(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", is(selfLink)))
@@ -83,8 +101,8 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
                         .param("field", "id"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-                .andExpect(jsonPath("$._embedded.physicianList", hasSize(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andExpect(jsonPath("$._embedded.physicianList", hasSize(1)))
                 .andExpect(jsonPath("$._links.self.href", is(selfLink)))
                 .andReturn();
 
@@ -96,13 +114,12 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
 
     @Test
     void getPhysicianById() throws Exception {
-        mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/{id}", 2).with(makeAuthorizedAdminUser()))
+        mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/{id}", 1).with(makeAuthorizedAdminUser()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.firstName", is("João")))
-                .andExpect(jsonPath("$.lastName", is("Brito")))
-                .andExpect(jsonPath("$.specialty", is("DERMATOLOGIST")))
-                .andExpect(jsonPath("$.appointments", hasSize(3)));
+                .andExpect(jsonPath("$.firstName", is("Marcela")))
+                .andExpect(jsonPath("$.lastName", is("Cavalcante")))
+                .andExpect(jsonPath("$.specialty", is("GENERAL_PRACTITIONER")));
     }
 
     @Test

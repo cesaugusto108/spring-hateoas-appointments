@@ -1,6 +1,8 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.security.Employee;
+import augusto108.ces.appointmenttracker.security.EmployeeRole;
+import augusto108.ces.appointmenttracker.security.enums.Role;
 import augusto108.ces.appointmenttracker.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +15,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
 
-@PropertySource("classpath:users.properties")
 public abstract class AuthorizeAdminUser {
     @Autowired
     private EmployeeService employeeService;
@@ -22,7 +23,16 @@ public abstract class AuthorizeAdminUser {
     private String empPassword;
 
     protected RequestPostProcessor makeAuthorizedAdminUser() {
-        final Employee employee = employeeService.findEmployeeByUsername("santos");
+        final EmployeeRole employeeRole = new EmployeeRole();
+        employeeRole.setRole(Role.ROLE_ADMIN);
+        employeeRole.setId(1L);
+
+        final Employee employee = new Employee();
+        employee.setUsername("santos");
+        employee.setPassword(empPassword);
+        employee.setActive(true);
+        employee.setRoles(List.of(employeeRole));
+        employee.setId(1L);
 
         return SecurityMockMvcRequestPostProcessors.user(new User(
                 employee.getUsername(),

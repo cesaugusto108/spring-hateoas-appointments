@@ -1,14 +1,13 @@
 package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.model.Patient;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class PatientServiceImplTest {
     @Autowired
@@ -26,19 +26,36 @@ class PatientServiceImplTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @BeforeEach
+    void setUp() {
+        final String query1 = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+                "    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
+
+        final String query2 = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+                "    VALUES (2, 'Paula', 'Martins', 'paula@email.com');";
+
+        entityManager.createNativeQuery(query1).executeUpdate();
+        entityManager.createNativeQuery(query2).executeUpdate();
+    }
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("delete from `tb_patient`;").executeUpdate();
+    }
+
     @Test
     void findAll() {
         final Page<Patient> patientsFirstPage = patientService.findAll(0, 10, Sort.Direction.ASC, "id");
 
-        assertEquals(12, patientsFirstPage.getTotalElements());
-        assertEquals(2, patientsFirstPage.getTotalPages());
-        assertEquals("José Santos (jose@email.com)", patientsFirstPage.get().toList().get(9).toString());
+        assertEquals(2, patientsFirstPage.getTotalElements());
+        assertEquals(1, patientsFirstPage.getTotalPages());
+        assertEquals("Pedro Cardoso (pedro@email.com)", patientsFirstPage.get().toList().get(0).toString());
     }
 
     @Test
     void getPatient() {
-        final Patient patient = patientService.getPatient(12L);
-        assertEquals("Pedro Siqueira (pedro.s@email.com)", patient.toString());
+        final Patient patient = patientService.getPatient(1L);
+        assertEquals("Pedro Cardoso (pedro@email.com)", patient.toString());
     }
 
     @Test
@@ -54,24 +71,24 @@ class PatientServiceImplTest {
                 .createQuery("from Patient order by id", Patient.class)
                 .getResultList();
 
-        assertEquals(13, patients.size());
-        assertEquals("Tiago Siqueira (tiago.siq@email.com)", patients.get(12).toString());
+        assertEquals(3, patients.size());
+        assertEquals("Tiago Siqueira (tiago.siq@email.com)", patients.get(2).toString());
     }
 
     @Test
     void findPatientByNameLikeOrEmailLike() {
         final Page<Patient> patientsByName = patientService
-                .findPatientByNameLikeOrEmailLike("Tavares", 0, 10, Sort.Direction.ASC, "id");
+                .findPatientByNameLikeOrEmailLike("Cardoso", 0, 10, Sort.Direction.ASC, "id");
 
         assertEquals(1, patientsByName.getTotalElements());
-        assertEquals(11, patientsByName.get().toList().get(0).getId());
-        assertEquals("Ana Tavares (ana@email.com)", patientsByName.get().toList().get(0).toString());
+        assertEquals(1, patientsByName.get().toList().get(0).getId());
+        assertEquals("Pedro Cardoso (pedro@email.com)", patientsByName.get().toList().get(0).toString());
 
         final Page<Patient> patientsByEmail = patientService
-                .findPatientByNameLikeOrEmailLike("beatriz@email", 0, 10, Sort.Direction.ASC, "id");
+                .findPatientByNameLikeOrEmailLike("paula@email", 0, 10, Sort.Direction.ASC, "id");
 
         assertEquals(1, patientsByEmail.getTotalElements());
-        assertEquals(6, patientsByEmail.get().toList().get(0).getId());
-        assertEquals("Beatriz Silva (beatriz@email.com)", patientsByEmail.get().toList().get(0).toString());
+        assertEquals(2, patientsByEmail.get().toList().get(0).getId());
+        assertEquals("Paula Martins (paula@email.com)", patientsByEmail.get().toList().get(0).toString());
     }
 }

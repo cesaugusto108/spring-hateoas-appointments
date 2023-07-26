@@ -2,6 +2,8 @@ package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.security.Employee;
 import augusto108.ces.appointmenttracker.security.enums.Role;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,11 +30,32 @@ class EmployeeServiceImplTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @BeforeEach
+    void setUp() {
+        final String query1 = "INSERT INTO `employee` (`id`, `active`, `password`, `username`)\n" +
+                "    VALUES (9002, 1, '1234', 'santos');";
+
+        final String query2 = "INSERT INTO `user_role` (`id`, `role`)\n" +
+                "    VALUES (10002, 'ROLE_ADMIN');";
+
+        final String query3 = "INSERT INTO `employees_roles` (`employee_id`, `role_id`)\n" +
+                "    VALUES (9002, 10002);";
+
+        entityManager.createNativeQuery(query1).executeUpdate();
+        entityManager.createNativeQuery(query2).executeUpdate();
+        entityManager.createNativeQuery(query3).executeUpdate();
+    }
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("delete from `employee`;");
+    }
+
     @Test
     void findEmployeeByUsername() {
-        final Employee employee = employeeService.findEmployeeByUsername("monteiro");
+        final Employee employee = employeeService.findEmployeeByUsername("santos");
 
-        assertEquals(1005, employee.getId());
+        assertEquals(9002, employee.getId());
     }
 
     @Test
@@ -48,8 +71,8 @@ class EmployeeServiceImplTest {
                 .createQuery("from Employee e order by id", Employee.class)
                 .getResultList();
 
-        assertEquals(5, employees.size());
-        assertEquals("batista", employees.get(4).getUsername());
+        assertEquals(2, employees.size());
+        assertEquals("batista", employees.get(0).getUsername());
     }
 
     @Test
@@ -59,8 +82,7 @@ class EmployeeServiceImplTest {
         employee.setPassword("1234");
         employee.setUsername("sampaio");
         employee.setRoles(
-                List.of(employeeRoleService.getEmployeeRoleByRole(Role.ROLE_EMPLOYEE),
-                        employeeRoleService.getEmployeeRoleByRole(Role.ROLE_MANAGER))
+                List.of(employeeRoleService.getEmployeeRoleByRole(Role.ROLE_ADMIN))
         );
 
         employeeService.saveEmployee(employee);
@@ -69,8 +91,7 @@ class EmployeeServiceImplTest {
 
         assertEquals("sampaio", userDetails.getUsername());
         assertEquals("1234", userDetails.getPassword());
-        assertEquals(2, userDetails.getAuthorities().size());
-        assertEquals("ROLE_EMPLOYEE", userDetails.getAuthorities().toArray()[0].toString());
-        assertEquals("ROLE_MANAGER", userDetails.getAuthorities().toArray()[1].toString());
+        assertEquals(1, userDetails.getAuthorities().size());
+        assertEquals("ROLE_ADMIN", userDetails.getAuthorities().toArray()[0].toString());
     }
 }

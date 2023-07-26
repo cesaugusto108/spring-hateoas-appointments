@@ -1,9 +1,8 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.model.Appointment;
-import augusto108.ces.appointmenttracker.model.Patient;
-import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Status;
+import augusto108.ces.appointmenttracker.services.AppointmentService;
 import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
@@ -20,6 +19,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 
@@ -50,12 +51,31 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
     @Autowired
     private PhysicianService physicianService;
 
+    @Autowired
+    private AppointmentService appointmentService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters(springSecurityFilterChain)
                 .build();
+
+        final String query1 = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+                "    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
+
+        final String query2 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (2, 'João', 'Cavalcante', 'DERMATOLOGIST');";
+
+        final String query3 = "INSERT INTO `tb_appointment` (`id`, `patient_id`, `physician_id`, `status`)\n" +
+                "    VALUES (1, 1, 2, 'PAYMENT_PENDING');";
+
+        entityManager.createNativeQuery(query1).executeUpdate();
+        entityManager.createNativeQuery(query2).executeUpdate();
+        entityManager.createNativeQuery(query3).executeUpdate();
     }
 
     @Test
@@ -71,7 +91,7 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andExpect(jsonPath("$.page.totalPages", is(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", is(selfLink)))
@@ -89,15 +109,15 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
 
         MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/search")
                         .with(makeAuthorizedAdminUser())
-                        .param("search", "finished")
+                        .param("search", "pending")
                         .param("page", "0")
                         .param("size", "20")
                         .param("direction", "ASC")
                         .param("field", "id"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.totalElements", is(5)))
-                .andExpect(jsonPath("$._embedded.appointmentList", hasSize(5)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)))
+                .andExpect(jsonPath("$._embedded.appointmentList", hasSize(1)))
                 .andExpect(jsonPath("$._links.self.href", is(selfLink)))
                 .andReturn();
 
@@ -122,32 +142,13 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
                 .andExpect(jsonPath("$._links.cancel.href", is("http://localhost" + VersioningConstant.VERSION + "/appointments/1/cancel")))
                 .andExpect(jsonPath("$._links.appointments.href", is(VersioningConstant.VERSION + "/appointments/?page=0&size=5&direction=ASC&field=id")))
                 .andReturn();
-
-        mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/{id}", 2)
-                        .with(makeAuthorizedAdminUser()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.patient.email", is("hugo@email.com")))
-                .andExpect(jsonPath("$.physician.specialty", is("DERMATOLOGIST")))
-                .andExpect(jsonPath("$.status", is("CONFIRMED")))
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$._links.self.href", is("http://localhost" + VersioningConstant.VERSION + "/appointments/2")))
-                .andExpect(jsonPath("$._links.finish.href", is("http://localhost" + VersioningConstant.VERSION + "/appointments/2/finish")))
-                .andExpect(jsonPath("$._links.cancel.href", is("http://localhost" + VersioningConstant.VERSION + "/appointments/2/cancel")))
-                .andExpect(jsonPath("$._links.appointments.href", is(VersioningConstant.VERSION + "/appointments/?page=0&size=5&direction=ASC&field=id")))
-                .andReturn();
     }
 
     @Test
     void saveAppointment() throws Exception {
-        final Patient patient = patientService.getPatient(1L);
-        final Physician physician = physicianService.getPhysician(3L);
         final Appointment appointment = new Appointment();
-        appointment.setPatient(patient);
-        appointment.setPhysician(physician);
-        appointment.setStatus(Status.CANCELLED);
-        patient.getAppointments().add(appointment);
-        physician.getAppointments().add(appointment);
+        appointment.setPatient(patientService.getPatient(1L));
+        appointment.setPhysician(physicianService.getPhysician(2L));
 
         mockMvc.perform(post(VersioningConstant.VERSION + "/appointments")
                         .with(makeAuthorizedAdminUser())
@@ -156,7 +157,7 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.patient.email", is("pedro@email.com")))
-                .andExpect(jsonPath("$.physician.specialty", is("CARDIOLOGIST")))
+                .andExpect(jsonPath("$.physician.specialty", is("DERMATOLOGIST")))
                 .andExpect(jsonPath("$.status", is("PAYMENT_PENDING")));
     }
 
@@ -168,7 +169,7 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.status", is("CONFIRMED")));
 
-        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/2/confirm")
+        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/1/confirm")
                         .with(makeAuthorizedAdminUser()))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType("application/hal+json"))
@@ -179,13 +180,16 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
 
     @Test
     void finishAppointment() throws Exception {
-        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/2/finish")
+        Appointment appointment = appointmentService.getAppointment(1L);
+        appointment.setStatus(Status.CONFIRMED);
+
+        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/1/finish")
                         .with(makeAuthorizedAdminUser()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.status", is("FINISHED")));
 
-        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/3/finish")
+        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/1/finish")
                         .with(makeAuthorizedAdminUser()))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType("application/hal+json"))
@@ -196,13 +200,13 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
 
     @Test
     void cancelAppointment() throws Exception {
-        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/2/cancel")
+        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/1/cancel")
                         .with(makeAuthorizedAdminUser()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.status", is("CANCELLED")));
 
-        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/5/cancel")
+        mockMvc.perform(patch(VersioningConstant.VERSION + "/appointments/1/cancel")
                         .with(makeAuthorizedAdminUser()))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType("application/hal+json"))

@@ -2,14 +2,13 @@ package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.model.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class PhysicianServiceImplTest {
     @Autowired
@@ -27,12 +27,29 @@ class PhysicianServiceImplTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @BeforeEach
+    void setUp() {
+        final String query1 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
+
+        final String query2 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+                "    VALUES (2, 'João', 'Cavalcante', 'DERMATOLOGIST');";
+
+        entityManager.createNativeQuery(query1).executeUpdate();
+        entityManager.createNativeQuery(query2).executeUpdate();
+    }
+
+    @AfterEach
+    void tearDown() {
+        entityManager.createNativeQuery("delete from `tb_physician`;").executeUpdate();
+    }
+
     @Test
     void findAll() {
         final Page<Physician> physicians = physicianService.findAll(0, 10, Sort.Direction.ASC, "id");
 
-        assertEquals(10, physicians.getTotalElements());
-        assertEquals("Zélia Silva (GENERAL_PRACTITIONER)", physicians.get().toList().get(9).toString());
+        assertEquals(2, physicians.getTotalElements());
+        assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physicians.get().toList().get(0).toString());
     }
 
     @Test
@@ -54,23 +71,23 @@ class PhysicianServiceImplTest {
                 .createQuery("from Physician order by id", Physician.class)
                 .getResultList();
 
-        assertEquals(11, physicians.size());
+        assertEquals(3, physicians.size());
+        assertEquals("Mardoqueu Santos (PSYCHIATRIST)", physicians.get(2).toString());
     }
 
     @Test
     void findPhysicianByNameLikeOrSpecialtyLike() {
         final Page<Physician> physiciansByName = physicianService
-                .findPhysicianByNameLikeOrSpecialtyLike("Marcela", 0, 10, Sort.Direction.ASC, "id");
+                .findPhysicianByNameLikeOrSpecialtyLike("Cavalcante", 0, 10, Sort.Direction.ASC, "id");
 
         assertEquals(2, physiciansByName.getTotalElements());
         assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physiciansByName.get().toList().get(0).toString());
-        assertEquals("Marcela Barros (ORTHOPEDIST)", physiciansByName.get().toList().get(1).toString());
+        assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansByName.get().toList().get(1).toString());
 
         final Page<Physician> physiciansBySpecialty = physicianService
-                .findPhysicianByNameLikeOrSpecialtyLike("CARDIOLOGIST", 0, 10, Sort.Direction.DESC, "firstName");
+                .findPhysicianByNameLikeOrSpecialtyLike("DERMATOLOGIST", 0, 10, Sort.Direction.DESC, "firstName");
 
-        assertEquals(2, physiciansBySpecialty.getTotalElements());
-        assertEquals("Osvaldo Pereira (CARDIOLOGIST)", physiciansBySpecialty.get().toList().get(0).toString());
-        assertEquals("Marília Dantas (CARDIOLOGIST)", physiciansBySpecialty.get().toList().get(1).toString());
+        assertEquals(1, physiciansBySpecialty.getTotalElements());
+        assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansBySpecialty.get().toList().get(0).toString());
     }
 }
