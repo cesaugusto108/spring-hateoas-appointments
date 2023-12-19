@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.controllers.handler;
+package augusto108.ces.appointmenttracker.handlers;
 
 import augusto108.ces.appointmenttracker.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApplicationExceptionHandler {
+
     @ExceptionHandler({EntityNotFoundException.class, NoHandlerFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(Exception e) {
         return notFoundErrorResponseEntity(e.toString(), e.getMessage(), HttpStatus.NOT_FOUND);
@@ -23,13 +24,13 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException e) {
         final String errorMessage = "Wrong property format: " + e.getMessage();
-
         return notFoundErrorResponseEntity(e.toString(), errorMessage, HttpStatus.BAD_REQUEST);
     }
 
-    private static ResponseEntity<ErrorResponse> notFoundErrorResponseEntity(String error, String message, HttpStatus status) {
+    private static ResponseEntity<ErrorResponse> notFoundErrorResponseEntity(String error,
+                                                                             String message,
+                                                                             HttpStatus status) {
         ErrorResponse response = new ErrorResponse(error, message, status);
-
         return ResponseEntity
                 .status(status)
                 .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
@@ -37,7 +38,7 @@ public class ApplicationExceptionHandler {
     }
 
     @Getter
-    private static class ErrorResponse {
+    public static class ErrorResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
         private final LocalDateTime timestamp;
 
