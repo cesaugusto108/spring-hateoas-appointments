@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 
 @Getter
 public class DefaultParameterObj {
+
     private final int page;
     private final int size;
     private final Sort.Direction direction;
