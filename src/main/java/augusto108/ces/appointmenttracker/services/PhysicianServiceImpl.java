@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.exceptions.EntityNotFoundException;
-import augusto108.ces.appointmenttracker.model.Physician;
+import augusto108.ces.appointmenttracker.model.entities.Physician;
 import augusto108.ces.appointmenttracker.repositories.PhysicianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

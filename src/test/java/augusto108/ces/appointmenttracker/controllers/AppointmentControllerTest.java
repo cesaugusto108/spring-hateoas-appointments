@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.controllers;
 
-import augusto108.ces.appointmenttracker.model.Appointment;
+import augusto108.ces.appointmenttracker.model.entities.Appointment;
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
 import augusto108.ces.appointmenttracker.services.PatientService;

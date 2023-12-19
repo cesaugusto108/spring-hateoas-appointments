@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
-import augusto108.ces.appointmenttracker.model.Physician;
+import augusto108.ces.appointmenttracker.model.entities.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

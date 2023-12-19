@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.entities;
 
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,6 +15,11 @@ import java.util.Set;
 @Entity
 @Table(name = "tb_physician")
 public class Physician extends Person {
+
+    @Setter
+    @Enumerated(value = EnumType.STRING)
+    private Specialty specialty;
+
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -23,10 +28,6 @@ public class Physician extends Person {
             inverseJoinColumns = @JoinColumn(name = "appointment_id")
     )
     private final Set<Appointment> appointments = new HashSet<>();
-
-    @Setter
-    @Enumerated(value = EnumType.STRING)
-    private Specialty specialty;
 
     @Override
     public String toString() {

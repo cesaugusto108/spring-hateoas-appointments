@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.entities;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,6 +11,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = "id")
 @MappedSuperclass
 public abstract class BaseEntity {
+
     @Id
     @SequenceGenerator(name = "seq_generator", initialValue = 101, allocationSize = 1)
     @GeneratedValue(generator = "seq_generator", strategy = GenerationType.SEQUENCE)

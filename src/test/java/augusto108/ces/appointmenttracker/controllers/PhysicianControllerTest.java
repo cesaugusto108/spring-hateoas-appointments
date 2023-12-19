@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.controllers;
 
-import augusto108.ces.appointmenttracker.model.Physician;
+import augusto108.ces.appointmenttracker.model.entities.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,10 +1,10 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.assemblers.PhysicianEntityModelAssembler;
-import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.converters.PhysicianModelConverter;
-import augusto108.ces.appointmenttracker.model.Physician;
-import augusto108.ces.appointmenttracker.model.PhysicianModel;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.model.entities.Physician;
+import augusto108.ces.appointmenttracker.model.representations.PhysicianModel;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import io.swagger.v3.oas.annotations.Operation;

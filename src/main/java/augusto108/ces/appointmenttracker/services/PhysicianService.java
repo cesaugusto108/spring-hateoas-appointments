@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
-import augusto108.ces.appointmenttracker.model.Physician;
+import augusto108.ces.appointmenttracker.model.entities.Physician;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 

@@ -1,5 +1,6 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.representations;
 
+import augusto108.ces.appointmenttracker.model.entities.Appointment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,12 +14,12 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode(callSuper = true, of = {})
 public class PatientModel extends RepresentationModel<PatientModel> {
+
     private Long id;
     private String firstName;
     private String lastName;
+    private String email;
 
     @JsonIgnoreProperties("patient")
     private Set<Appointment> appointments = new HashSet<>();
-
-    private String email;
 }

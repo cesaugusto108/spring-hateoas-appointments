@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.entities;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import javax.persistence.MappedSuperclass;
 @EqualsAndHashCode(callSuper = true, of = {})
 @MappedSuperclass
 public abstract class Person extends BaseEntity {
+
     @Column(name = "first_name", length = 50, nullable = false)
     private String firstName;
 

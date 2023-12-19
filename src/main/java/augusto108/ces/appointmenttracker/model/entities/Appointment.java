@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.entities;
 
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import lombok.EqualsAndHashCode;
@@ -13,6 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "tb_appointment")
 public class Appointment extends BaseEntity {
+
     @ManyToOne
     private Patient patient;
 

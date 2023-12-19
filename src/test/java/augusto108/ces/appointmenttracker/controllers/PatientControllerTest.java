@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.controllers;
 
-import augusto108.ces.appointmenttracker.model.Patient;
+import augusto108.ces.appointmenttracker.model.entities.Patient;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;

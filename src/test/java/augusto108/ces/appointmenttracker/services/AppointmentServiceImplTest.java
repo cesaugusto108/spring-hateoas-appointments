@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
-import augusto108.ces.appointmenttracker.model.Appointment;
+import augusto108.ces.appointmenttracker.model.entities.Appointment;
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.model;
+package augusto108.ces.appointmenttracker.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
@@ -14,6 +14,11 @@ import java.util.Set;
 @Entity
 @Table(name = "tb_patient")
 public class Patient extends Person {
+
+    @Setter
+    @Column(name = "email", length = 100)
+    private String email;
+
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -22,10 +27,6 @@ public class Patient extends Person {
             inverseJoinColumns = @JoinColumn(name = "appointment_id")
     )
     private final Set<Appointment> appointments = new HashSet<>();
-
-    @Setter
-    @Column(name = "email", length = 100)
-    private String email;
 
     @Override
     public String toString() {

@@ -1,8 +1,8 @@
 package augusto108.ces.appointmenttracker.converters;
 
 import augusto108.ces.appointmenttracker.controllers.PatientController;
-import augusto108.ces.appointmenttracker.model.Patient;
-import augusto108.ces.appointmenttracker.model.PatientModel;
+import augusto108.ces.appointmenttracker.model.entities.Patient;
+import augusto108.ces.appointmenttracker.model.representations.PatientModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
