@@ -18,6 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class AppointmentEntityModelAssembler implements RepresentationModelAssembler<Appointment, EntityModel<Appointment>> {
+
     private final DefaultParameterObj param = new DefaultParameterObj();
 
     @Override
@@ -38,14 +39,8 @@ public class AppointmentEntityModelAssembler implements RepresentationModelAssem
         final List<Link> paymentPendingLinks = Arrays.asList(self, confirm, cancel, appointments, search);
         final List<Link> confirmedLinks = Arrays.asList(self, cancel, finish, appointments, search);
 
-        if (entity.getStatus() == Status.PAYMENT_PENDING) {
-            return EntityModel.of(entity, paymentPendingLinks);
-        }
-
-        if (entity.getStatus() == Status.CONFIRMED) {
-            return EntityModel.of(entity, confirmedLinks);
-        }
-
+        if (entity.getStatus() == Status.PAYMENT_PENDING) return EntityModel.of(entity, paymentPendingLinks);
+        if (entity.getStatus() == Status.CONFIRMED) return EntityModel.of(entity, confirmedLinks);
         return EntityModel.of(entity, commonLinks);
     }
 }

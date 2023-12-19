@@ -13,18 +13,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class PatientEntityModelAssembler implements RepresentationModelAssembler<Patient, EntityModel<Patient>> {
+
     private final DefaultParameterObj param = new DefaultParameterObj();
 
     @Override
-    public EntityModel<Patient> toModel(Patient entity) {
+    public EntityModel<Patient> toModel(Patient patient) {
         final int page = param.getPage();
         final int size = param.getSize();
         final Sort.Direction direction = param.getDirection();
         final String field = param.getField();
-
         return EntityModel.of(
-                entity,
-                linkTo(methodOn(PatientController.class).getPatientById(entity.getId())).withSelfRel(),
+                patient,
+                linkTo(methodOn(PatientController.class).getPatientById(patient.getId())).withSelfRel(),
                 linkTo(methodOn(PatientController.class).getPatients(page, size, direction, field)).withRel("patients"),
                 linkTo(methodOn(PatientController.class).searchPatients("", page, size, direction, field)).withRel("search")
         );
