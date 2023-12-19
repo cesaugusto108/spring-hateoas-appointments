@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.assemblers;
 
 import augusto108.ces.appointmenttracker.controllers.PatientController;
-import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.model.Patient;
 import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;

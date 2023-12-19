@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.controllers.helpers;
+package augusto108.ces.appointmenttracker.helpers;
 
 import lombok.Getter;
 import org.springframework.data.domain.Sort;

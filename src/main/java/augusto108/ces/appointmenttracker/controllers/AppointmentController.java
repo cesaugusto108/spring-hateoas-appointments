@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.assemblers.AppointmentEntityModelAssembler;
-import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.converters.AppointmentModelConverter;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.AppointmentModel;

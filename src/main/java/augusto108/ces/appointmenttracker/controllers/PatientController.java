@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.assemblers.PatientEntityModelAssembler;
-import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.converters.PatientModelConverter;
 import augusto108.ces.appointmenttracker.model.Patient;
 import augusto108.ces.appointmenttracker.model.PatientModel;

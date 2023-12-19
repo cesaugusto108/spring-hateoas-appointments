@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.controllers;
 
-import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

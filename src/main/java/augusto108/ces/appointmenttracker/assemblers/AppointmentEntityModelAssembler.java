@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.assemblers;
 
 import augusto108.ces.appointmenttracker.controllers.AppointmentController;
-import augusto108.ces.appointmenttracker.controllers.helpers.DefaultParameterObj;
+import augusto108.ces.appointmenttracker.helpers.DefaultParameterObj;
 import augusto108.ces.appointmenttracker.model.Appointment;
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import org.springframework.data.domain.Sort;
