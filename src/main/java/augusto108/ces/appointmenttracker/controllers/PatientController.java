@@ -28,6 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(VersioningConstant.VERSION + "/patients")
 @RequiredArgsConstructor
 public class PatientController {
+
     private final PatientService service;
     private final PatientModelConverter converter;
     private final PagedResourcesAssembler<Patient> resourcesAssembler;
@@ -50,7 +51,6 @@ public class PatientController {
             @RequestParam(defaultValue = "id") String field
     ) {
         Page<Patient> patients = service.findAll(page, size, direction, field);
-
         return ResponseEntity.ok(resourcesAssembler.toModel(patients, modelAssembler));
     }
 
@@ -64,7 +64,6 @@ public class PatientController {
             @RequestParam(defaultValue = "id") String field
     ) {
         Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size, direction, field);
-
         return ResponseEntity.ok(resourcesAssembler.toModel(patients, modelAssembler));
     }
 
@@ -72,18 +71,14 @@ public class PatientController {
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<PatientModel> getPatientById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getPatientById(id)).withSelfRel();
-
         return ResponseEntity.ok(converter.toModel(service.getPatient(id)).add(self, aggregateRoot));
     }
 
     @Operation(summary = "save patient")
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<PatientModel> savePatient(@RequestBody Patient patient) {
-        final Patient p = service.savePatient(patient);
-        Link self = linkTo(methodOn(controller).getPatientById(p.getId())).withSelfRel();
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(converter.toModel(p).add(self, aggregateRoot));
+        final Patient savedPatient = service.savePatient(patient);
+        Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
+        return ResponseEntity.status(HttpStatus.CREATED).body(converter.toModel(savedPatient).add(self, aggregateRoot));
     }
 }

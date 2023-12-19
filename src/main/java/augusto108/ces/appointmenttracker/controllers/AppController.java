@@ -23,6 +23,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(VersioningConstant.VERSION + "/")
 @RequiredArgsConstructor
 public class AppController {
+
     private final DefaultParameterObj param = new DefaultParameterObj();
 
     @Operation(summary = "App root links")

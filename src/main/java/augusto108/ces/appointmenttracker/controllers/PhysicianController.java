@@ -28,6 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(VersioningConstant.VERSION + "/physicians")
 @RequiredArgsConstructor
 public class PhysicianController {
+
     private final PhysicianService service;
     private final PhysicianModelConverter converter;
     private final PagedResourcesAssembler<Physician> resourcesAssembler;
@@ -50,7 +51,6 @@ public class PhysicianController {
             @RequestParam(defaultValue = "id") String field
     ) {
         Page<Physician> physicians = service.findAll(page, size, direction, field);
-
         return ResponseEntity.ok(resourcesAssembler.toModel(physicians, modelAssembler));
     }
 
@@ -64,7 +64,6 @@ public class PhysicianController {
             @RequestParam(defaultValue = "id") String field
     ) {
         Page<Physician> physicians = service.findPhysicianByNameLikeOrSpecialtyLike(search, page, size, direction, field);
-
         return ResponseEntity.ok(resourcesAssembler.toModel(physicians, modelAssembler));
     }
 
@@ -72,18 +71,14 @@ public class PhysicianController {
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<PhysicianModel> getPhysicianById(@PathVariable("id") Long id) {
         Link self = linkTo(methodOn(controller).getPhysicianById(id)).withSelfRel();
-
         return ResponseEntity.ok(converter.toModel(service.getPhysician(id)).add(self, aggregateRoot));
     }
 
     @Operation(summary = "save physician")
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<PhysicianModel> savePhysician(@RequestBody Physician physician) {
-        final Physician p = service.savePhysician(physician);
-        Link self = linkTo(methodOn(controller).getPhysicianById(p.getId())).withSelfRel();
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(converter.toModel(p).add(self, aggregateRoot));
+        final Physician savedPhysician = service.savePhysician(physician);
+        Link self = linkTo(methodOn(controller).getPhysicianById(savedPhysician.getId())).withSelfRel();
+        return ResponseEntity.status(HttpStatus.CREATED).body(converter.toModel(savedPhysician).add(self, aggregateRoot));
     }
 }
