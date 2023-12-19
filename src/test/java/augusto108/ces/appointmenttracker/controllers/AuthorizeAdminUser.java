@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.List;
 
+@PropertySource(value = "classpath:users.properties")
 public abstract class AuthorizeAdminUser {
     @Autowired
     private EmployeeService employeeService;
