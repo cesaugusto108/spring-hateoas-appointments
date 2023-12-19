@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
     @Query(
             "from Appointment a where " +
-                    "lower(status) like lower(concat('%', :searchStr, '%')) or " +
+                    "lower(a.status) like lower(concat('%', :searchStr, '%')) or " +
                     "lower(a.patient.firstName) like lower(concat('%', :searchStr, '%')) or " +
                     "lower(a.patient.lastName) like lower(concat('%', :searchStr, '%')) or " +
                     "lower(a.physician.firstName) like lower(concat('%', :searchStr, '%')) or " +

@@ -9,12 +9,13 @@ import javax.persistence.EntityManager;
 @Repository
 @RequiredArgsConstructor
 public class EmployeeRepositoryImpl implements EmployeeRepository {
+
     private final EntityManager entityManager;
 
     @Override
     public Employee findEmployeeByUsername(String username) {
         return entityManager
-                .createQuery("from Employee e where username = :username", Employee.class)
+                .createQuery("from Employee e where e.username = :username", Employee.class)
                 .setParameter("username", username)
                 .getSingleResult();
     }

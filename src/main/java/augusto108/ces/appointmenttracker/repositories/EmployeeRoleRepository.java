@@ -4,6 +4,7 @@ import augusto108.ces.appointmenttracker.security.EmployeeRole;
 import augusto108.ces.appointmenttracker.security.enums.Role;
 
 public interface EmployeeRoleRepository {
+
     EmployeeRole getEmployeeRolebyRole(Role role);
 
     void saveEmployeeRole(EmployeeRole employeeRole);

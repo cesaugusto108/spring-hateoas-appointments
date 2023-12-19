@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
+
     @Query(
             "from Patient p where " +
-                    "lower(first_name) like lower(concat('%', :searchStr, '%')) or " +
-                    "lower(last_name) like lower(concat('%', :searchStr, '%')) or " +
-                    "lower(email) like lower(concat('%', :searchStr, '%'))"
+                    "lower(p.firstName) like lower(concat('%', :searchStr, '%')) or " +
+                    "lower(p.lastName) like lower(concat('%', :searchStr, '%')) or " +
+                    "lower(p.email) like lower(concat('%', :searchStr, '%'))"
     )
     Page<Patient> findPatientByNameLikeOrEmailLike(@Param("searchStr") String searchStr, Pageable pageable);
 }

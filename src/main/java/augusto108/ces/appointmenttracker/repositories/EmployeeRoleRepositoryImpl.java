@@ -10,12 +10,13 @@ import javax.persistence.EntityManager;
 @Repository
 @RequiredArgsConstructor
 public class EmployeeRoleRepositoryImpl implements EmployeeRoleRepository {
+
     private final EntityManager entityManager;
 
     @Override
     public EmployeeRole getEmployeeRolebyRole(Role role) {
         return entityManager
-                .createQuery("from EmployeeRole e where role = :role", EmployeeRole.class)
+                .createQuery("from EmployeeRole e where e.role = :role", EmployeeRole.class)
                 .setParameter("role", role)
                 .getSingleResult();
     }
