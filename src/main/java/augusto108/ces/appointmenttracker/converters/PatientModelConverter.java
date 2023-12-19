@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PatientModelConverter extends RepresentationModelAssemblerSupport<Patient, PatientModel> {
+
     public PatientModelConverter() {
         super(PatientController.class, PatientModel.class);
     }
 
     @Override
-    public PatientModel toModel(Patient entity) {
-        PatientModel patientModel = new PatientModel();
-
-        BeanUtils.copyProperties(entity, patientModel);
-
+    public PatientModel toModel(Patient patient) {
+        final PatientModel patientModel = new PatientModel();
+        BeanUtils.copyProperties(patient, patientModel);
         return patientModel;
     }
 }

@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppointmentModelConverter extends RepresentationModelAssemblerSupport<Appointment, AppointmentModel> {
+
     public AppointmentModelConverter() {
         super(AppointmentController.class, AppointmentModel.class);
     }
 
     @Override
-    public AppointmentModel toModel(Appointment entity) {
-        AppointmentModel appointmentModel = new AppointmentModel();
-
-        BeanUtils.copyProperties(entity, appointmentModel);
-
+    public AppointmentModel toModel(Appointment appointment) {
+        final AppointmentModel appointmentModel = new AppointmentModel();
+        BeanUtils.copyProperties(appointment, appointmentModel);
         return appointmentModel;
     }
 }
