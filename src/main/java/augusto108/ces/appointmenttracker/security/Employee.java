@@ -13,6 +13,7 @@ import java.util.Collection;
 @Entity
 @Table(name = "employee")
 public final class Employee extends SecurityBaseEntity {
+
     @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 

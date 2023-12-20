@@ -11,6 +11,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = "id")
 @MappedSuperclass
 public abstract class SecurityBaseEntity {
+
     @Id
     @SequenceGenerator(name = "sec_seq_generator", initialValue = 1001, allocationSize = 1)
     @GeneratedValue(generator = "sec_seq_generator", strategy = GenerationType.SEQUENCE)

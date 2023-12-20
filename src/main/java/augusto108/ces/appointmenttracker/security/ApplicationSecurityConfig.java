@@ -18,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @PropertySource("classpath:users.properties")
 @Profile("!test")
 public class ApplicationSecurityConfig {
+
     private final EmployeeService employeeService;
     private final EmployeeRoleService employeeRoleService;
 
@@ -29,26 +30,21 @@ public class ApplicationSecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider(EmployeeService employeeService) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-
         authenticationProvider.setUserDetailsService(employeeService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
-
         return authenticationProvider;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeRequests(
-                registry -> registry
+        httpSecurity.authorizeRequests(registry -> registry
                         .antMatchers(HttpMethod.GET).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN", "TRAINEE")
                         .antMatchers(HttpMethod.POST).hasAnyRole("MANAGER", "ADMIN")
-                        .antMatchers(HttpMethod.PATCH).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
-        );
+                        .antMatchers(HttpMethod.PATCH).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN"));
 
         httpSecurity.httpBasic();
         httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();
-
         return httpSecurity.build();
     }
 }

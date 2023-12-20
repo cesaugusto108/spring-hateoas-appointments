@@ -13,8 +13,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user_role")
 public final class EmployeeRole extends SecurityBaseEntity {
-    @Column(name = "role", nullable = false, unique = true, length = 50)
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, unique = true, length = 50)
     private Role role;
 
     @Override
