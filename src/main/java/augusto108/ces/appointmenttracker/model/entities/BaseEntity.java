@@ -15,5 +15,6 @@ public abstract class BaseEntity {
     @Id
     @SequenceGenerator(name = "seq_generator", initialValue = 101, allocationSize = 1)
     @GeneratedValue(generator = "seq_generator", strategy = GenerationType.SEQUENCE)
+    @Column(name = "id", nullable = false, unique = true)
     private Long id;
 }

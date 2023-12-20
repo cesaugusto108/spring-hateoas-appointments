@@ -18,6 +18,7 @@ public class Physician extends Person {
 
     @Setter
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "specialty")
     private Specialty specialty;
 
     @JsonIgnore
