@@ -44,7 +44,7 @@ class EmployeeRoleServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        entityManager.createNativeQuery("delete from `employee_roles`;");
+        entityManager.createNativeQuery("delete from `employees_roles`;");
         entityManager.createNativeQuery("delete from `employee`;");
         entityManager.createNativeQuery("delete from `user_role`;");
     }
