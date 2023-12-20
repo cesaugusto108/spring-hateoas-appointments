@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 public interface PatientService {
+
     Page<Patient> findAll(int page, int size, Sort.Direction direction, String field);
 
     Patient getPatient(Long id);

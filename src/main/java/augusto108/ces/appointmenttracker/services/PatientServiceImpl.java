@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PatientServiceImpl implements PatientService {
+
     private final PatientRepository repository;
 
     @Override
     public Page<Patient> findAll(int page, int size, Sort.Direction direction, String field) {
-        Sort sortCriteria = Sort.by(direction, field);
-
+        final Sort sortCriteria = Sort.by(direction, field);
         return repository.findAll(PageRequest.of(page, size, sortCriteria));
     }
 
@@ -32,9 +32,12 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Page<Patient> findPatientByNameLikeOrEmailLike(String searchStr, int page, int size, Sort.Direction direction, String field) {
-        Sort sortCriteria = Sort.by(direction, field);
-
+    public Page<Patient> findPatientByNameLikeOrEmailLike(String searchStr,
+                                                          int page,
+                                                          int size,
+                                                          Sort.Direction direction,
+                                                          String field) {
+        final Sort sortCriteria = Sort.by(direction, field);
         return repository.findPatientByNameLikeOrEmailLike(searchStr, PageRequest.of(page, size, sortCriteria));
     }
 }

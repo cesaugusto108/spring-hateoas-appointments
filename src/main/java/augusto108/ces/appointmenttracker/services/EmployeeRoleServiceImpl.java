@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class EmployeeRoleServiceImpl implements EmployeeRoleService {
+
     private final EmployeeRoleRepository repository;
 
     @Override

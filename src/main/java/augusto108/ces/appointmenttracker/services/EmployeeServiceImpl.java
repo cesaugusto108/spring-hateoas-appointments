@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
+
     private final EmployeeRepository repository;
 
     @Override
@@ -32,8 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Employee employee = repository.findEmployeeByUsername(username);
-
+        final Employee employee = repository.findEmployeeByUsername(username);
         return new org.springframework.security.core.userdetails
                 .User(employee.getUsername(), employee.getPassword(), mapRolesToPermissions(employee.getRoles()));
     }
