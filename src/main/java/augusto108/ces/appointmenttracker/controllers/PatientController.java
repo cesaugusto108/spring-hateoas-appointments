@@ -42,6 +42,7 @@ public class PatientController {
                     .getPatients(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
                     .withRel("patients");
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get patients")
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Patient>>> getPatients(
@@ -50,10 +51,12 @@ public class PatientController {
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "id") String field
     ) {
-        Page<Patient> patients = service.findAll(page, size, direction, field);
-        return ResponseEntity.ok(resourcesAssembler.toModel(patients, modelAssembler));
+        final Page<Patient> patients = service.findAll(page, size, direction, field);
+        final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
+        return ResponseEntity.status(200).body(pagedModel);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "search patients")
     @GetMapping(value = "/search", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Patient>>> searchPatients(
@@ -63,22 +66,30 @@ public class PatientController {
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "id") String field
     ) {
-        Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size, direction, field);
-        return ResponseEntity.ok(resourcesAssembler.toModel(patients, modelAssembler));
+        final Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size, direction, field);
+        final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
+        return ResponseEntity.status(200).body(pagedModel);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get patient by id")
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<PatientModel> getPatientById(@PathVariable("id") Long id) {
-        Link self = linkTo(methodOn(controller).getPatientById(id)).withSelfRel();
-        return ResponseEntity.ok(converter.toModel(service.getPatient(id)).add(self, aggregateRoot));
+        final Link self = linkTo(methodOn(controller).getPatientById(id)).withSelfRel();
+        final Patient patient = service.getPatient(id);
+        final PatientModel patientModel = converter.toModel(patient);
+        patientModel.add(self, aggregateRoot);
+        return ResponseEntity.status(200).body(patientModel);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "save patient")
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<PatientModel> savePatient(@RequestBody Patient patient) {
         final Patient savedPatient = service.savePatient(patient);
-        Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
-        return ResponseEntity.status(HttpStatus.CREATED).body(converter.toModel(savedPatient).add(self, aggregateRoot));
+        final Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
+        final PatientModel patientModel = converter.toModel(savedPatient);
+        patientModel.add(self, aggregateRoot);
+        return ResponseEntity.status(201).body(patientModel);
     }
 }
