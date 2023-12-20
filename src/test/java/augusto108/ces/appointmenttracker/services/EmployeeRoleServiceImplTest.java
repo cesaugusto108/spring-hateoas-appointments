@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("sec")
 @Transactional
 class EmployeeRoleServiceImplTest {
+
     @Autowired
     private EmployeeRoleService employeeRoleService;
 
@@ -51,7 +52,6 @@ class EmployeeRoleServiceImplTest {
     @Test
     void getEmployeeRoleByRole() {
         final EmployeeRole employeeRole = employeeRoleService.getEmployeeRoleByRole(Role.ROLE_ADMIN);
-
         assertEquals("ROLE_ADMIN", employeeRole.getRole().toString());
         assertEquals(10002, employeeRole.getId());
     }
@@ -60,9 +60,7 @@ class EmployeeRoleServiceImplTest {
     void saveEmployeeRole() {
         final EmployeeRole role = new EmployeeRole(Role.ROLE_TEST);
         employeeRoleService.saveEmployeeRole(role);
-
         final EmployeeRole r = employeeRoleService.getEmployeeRoleByRole(Role.ROLE_TEST);
-
         assertEquals("ROLE_TEST", r.getRole().toString());
         assertEquals(1001, r.getId());
     }

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class PhysicianServiceImplTest {
+
     @Autowired
     private PhysicianService physicianService;
 
@@ -47,7 +48,6 @@ class PhysicianServiceImplTest {
     @Test
     void findAll() {
         final Page<Physician> physicians = physicianService.findAll(0, 10, Sort.Direction.ASC, "id");
-
         assertEquals(2, physicians.getTotalElements());
         assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physicians.get().toList().get(0).toString());
     }

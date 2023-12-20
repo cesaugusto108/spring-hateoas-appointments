@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class AppointmentServiceImplTest {
+
     @Autowired
     private AppointmentService appointmentService;
 
@@ -74,8 +75,7 @@ class AppointmentServiceImplTest {
 
         assertEquals(2, appointments.getTotalElements());
         assertEquals("Patient: Paula Martins (paula@email.com) | " +
-                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
-                        "CONFIRMED",
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | CONFIRMED",
                 appointments.get().toList().get(1).toString());
     }
 
@@ -85,9 +85,7 @@ class AppointmentServiceImplTest {
                 .getAppointment(2L);
 
         assertEquals("Patient: Paula Martins (paula@email.com) | " +
-                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
-                        "CONFIRMED",
-                appointment.toString());
+                "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | CONFIRMED", appointment.toString());
     }
 
     @Test
@@ -105,9 +103,7 @@ class AppointmentServiceImplTest {
 
         assertEquals(3, appointments.size());
         assertEquals("Patient: Paula Martins (paula@email.com) | " +
-                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
-                        "FINISHED",
-                appointments.get(2).toString());
+                "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | FINISHED", appointments.get(2).toString());
     }
 
     @Test
@@ -123,8 +119,7 @@ class AppointmentServiceImplTest {
 
         assertEquals(1, appointmentsByPersonName.getTotalElements());
         assertEquals("Patient: Paula Martins (paula@email.com) | " +
-                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | " +
-                        "CONFIRMED",
+                        "Physician: Marcela Cavalcante (GENERAL_PRACTITIONER) | CONFIRMED",
                 appointmentsByPersonName.get().toList().get(0).toString());
     }
 }

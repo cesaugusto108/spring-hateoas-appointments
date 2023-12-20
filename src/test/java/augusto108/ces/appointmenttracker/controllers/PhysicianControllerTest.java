@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("sec")
 @Transactional
 class PhysicianControllerTest extends AuthorizeAdminUser {
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -85,7 +86,6 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
 
         final String content = result.getResponse().getContentAsString();
         final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-
         assertEquals(3, pageJsonKeySetSize);
     }
 
@@ -108,7 +108,6 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
 
         final String content = result.getResponse().getContentAsString();
         final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-
         assertEquals(3, pageJsonKeySetSize);
     }
 

@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class PatientServiceImplTest {
+
     @Autowired
     private PatientService patientService;
 
@@ -46,7 +47,6 @@ class PatientServiceImplTest {
     @Test
     void findAll() {
         final Page<Patient> patientsFirstPage = patientService.findAll(0, 10, Sort.Direction.ASC, "id");
-
         assertEquals(2, patientsFirstPage.getTotalElements());
         assertEquals(1, patientsFirstPage.getTotalPages());
         assertEquals("Pedro Cardoso (pedro@email.com)", patientsFirstPage.get().toList().get(0).toString());

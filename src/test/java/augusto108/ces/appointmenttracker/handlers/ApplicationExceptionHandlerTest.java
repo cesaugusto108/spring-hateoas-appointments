@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.controllers.handler;
+package augusto108.ces.appointmenttracker.handlers;
 
 import augusto108.ces.appointmenttracker.controllers.AuthorizeAdminUser;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("sec")
 class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -32,10 +33,7 @@ class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .addFilters(springSecurityFilterChain)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
     }
 
     @Test

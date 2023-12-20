@@ -17,6 +17,7 @@ import java.util.List;
 
 @PropertySource(value = "classpath:users.properties")
 public abstract class AuthorizeAdminUser {
+
     @Autowired
     private EmployeeService employeeService;
 
@@ -35,9 +36,9 @@ public abstract class AuthorizeAdminUser {
         employee.setRoles(List.of(employeeRole));
         employee.setId(1L);
 
-        return SecurityMockMvcRequestPostProcessors.user(new User(
-                employee.getUsername(),
-                new BCryptPasswordEncoder().encode(empPassword),
-                List.of(new SimpleGrantedAuthority(employee.getRoles().toArray()[0].toString()))));
+        return SecurityMockMvcRequestPostProcessors.user(
+                new User(employee.getUsername(),
+                        new BCryptPasswordEncoder().encode(empPassword),
+                        List.of(new SimpleGrantedAuthority(employee.getRoles().toArray()[0].toString()))));
     }
 }

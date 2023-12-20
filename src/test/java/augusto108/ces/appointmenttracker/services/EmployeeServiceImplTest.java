@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("sec")
 @Transactional
 class EmployeeServiceImplTest {
+
     @Autowired
     private EmployeeService employeeService;
 
@@ -54,7 +55,6 @@ class EmployeeServiceImplTest {
     @Test
     void findEmployeeByUsername() {
         final Employee employee = employeeService.findEmployeeByUsername("santos");
-
         assertEquals(9002, employee.getId());
     }
 

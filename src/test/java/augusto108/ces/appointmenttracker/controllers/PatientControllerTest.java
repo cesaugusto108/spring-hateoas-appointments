@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("sec")
 @Transactional
 class PatientControllerTest extends AuthorizeAdminUser {
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -47,10 +48,7 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .addFilters(springSecurityFilterChain)
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
 
         final String query = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
                 "    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
@@ -83,7 +81,6 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
         final String content = result.getResponse().getContentAsString();
         final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-
         assertEquals(3, pageJsonKeySetSize);
     }
 
@@ -108,7 +105,6 @@ class PatientControllerTest extends AuthorizeAdminUser {
 
         final String content = result.getResponse().getContentAsString();
         final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-
         assertEquals(3, pageJsonKeySetSize);
     }
 

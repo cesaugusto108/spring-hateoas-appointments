@@ -19,10 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 class AppControllerTest {
-    @Autowired
-    private AppController appController;
 
     private MockMvc mockMvc;
+
+    @Autowired
+    private AppController appController;
 
     @Autowired
     private WebApplicationContext context;
