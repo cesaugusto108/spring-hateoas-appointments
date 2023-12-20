@@ -49,6 +49,7 @@ public class AppointmentController {
             .getAppointments(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
             .withRel("appointments");
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get appointments")
     @GetMapping(value = "", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Appointment>>> getAppointments(
@@ -57,10 +58,12 @@ public class AppointmentController {
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "id") String field
     ) {
-        Page<Appointment> appointments = service.findAll(page, size, direction, field);
-        return ResponseEntity.ok(resourcesAssembler.toModel(appointments, modelAssembler));
+        final Page<Appointment> appointments = service.findAll(page, size, direction, field);
+        final PagedModel<EntityModel<Appointment>> pagedModel = resourcesAssembler.toModel(appointments, modelAssembler);
+        return ResponseEntity.status(200).body(pagedModel);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "search appointments")
     @GetMapping(value = "/search", produces = "application/hal+json")
     public ResponseEntity<PagedModel<EntityModel<Appointment>>> searchAppointments(
@@ -70,28 +73,33 @@ public class AppointmentController {
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "id") String field
     ) {
-        Page<Appointment> appointments = service.findAppointmentByStatusOrPersonName(search, page, size, direction, field);
-        return ResponseEntity.ok(resourcesAssembler.toModel(appointments, modelAssembler));
+        final Page<Appointment> appointments = service.findAppointmentByStatusOrPersonName(search, page, size, direction, field);
+        final PagedModel<EntityModel<Appointment>> pagedModel = resourcesAssembler.toModel(appointments, modelAssembler);
+        return ResponseEntity.status(200).body(pagedModel);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "get appointment by id")
     @GetMapping(value = "/{id}", produces = "application/hal+json")
     public ResponseEntity<AppointmentModel> getAppointmentById(@PathVariable("id") Long id) {
-        Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
-        Link confirmLink = linkTo(methodOn(controller).confirmAppointment(id)).withRel("confirm");
-        Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
-        Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
-        Appointment appointment = service.getAppointment(id);
+        final Link self = linkTo(methodOn(controller).getAppointmentById(id)).withSelfRel();
+        final Link confirmLink = linkTo(methodOn(controller).confirmAppointment(id)).withRel("confirm");
+        final Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
+        final Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
+        final Appointment appointment = service.getAppointment(id);
+        final AppointmentModel appointmentModel = converter.toModel(appointment);
+        appointmentModel.add(self, aggregateRoot);
 
         if (appointment.getStatus() == Status.PAYMENT_PENDING)
-            return ResponseEntity.ok(converter.toModel(appointment).add(self, confirmLink, cancelLink, aggregateRoot));
+            return ResponseEntity.status(200).body(appointmentModel.add(confirmLink, cancelLink));
 
         if (appointment.getStatus() == Status.CONFIRMED)
-            return ResponseEntity.ok(converter.toModel(appointment).add(self, finishLink, cancelLink, aggregateRoot));
+            return ResponseEntity.status(200).body(appointmentModel.add(finishLink, cancelLink));
 
-        return ResponseEntity.ok(converter.toModel(appointment).add(self, aggregateRoot));
+        return ResponseEntity.status(200).body(appointmentModel);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "save appointment")
     @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
     public ResponseEntity<AppointmentModel> saveAppointment(@RequestBody Appointment appointment) {
@@ -106,13 +114,12 @@ public class AppointmentController {
         physician.getAppointments().add(savedAppointment);
         physicianService.savePhysician(physician);
 
-        Link self = linkTo(methodOn(controller).getAppointmentById(savedAppointment.getId())).withSelfRel();
-        Link confirmLink = linkTo(methodOn(controller).confirmAppointment(savedAppointment.getId())).withRel("confirm");
-        Link cancelLink = linkTo(methodOn(controller).cancelAppointment(savedAppointment.getId())).withRel("cancel");
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(converter.toModel(savedAppointment).add(self, confirmLink, cancelLink, aggregateRoot));
+        final Link self = linkTo(methodOn(controller).getAppointmentById(savedAppointment.getId())).withSelfRel();
+        final Link confirmLink = linkTo(methodOn(controller).confirmAppointment(savedAppointment.getId())).withRel("confirm");
+        final Link cancelLink = linkTo(methodOn(controller).cancelAppointment(savedAppointment.getId())).withRel("cancel");
+        final AppointmentModel appointmentModel = converter.toModel(savedAppointment);
+        appointmentModel.add(self, confirmLink, cancelLink, aggregateRoot);
+        return ResponseEntity.status(201).body(appointmentModel);
     }
 
     @Operation(summary = "confirm appointment")
@@ -122,12 +129,13 @@ public class AppointmentController {
 
         if (appointment.getStatus() == Status.PAYMENT_PENDING) {
             appointment.setStatus(Status.CONFIRMED);
-            Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
-            Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
-            Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
-
-            return ResponseEntity
-                    .ok(converter.toModel(service.saveAppointment(appointment)).add(self, finishLink, cancelLink, aggregateRoot));
+            final Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
+            final Link finishLink = linkTo(methodOn(controller).finishAppointment(id)).withRel("finish");
+            final Link cancelLink = linkTo(methodOn(controller).cancelAppointment(id)).withRel("cancel");
+            final Appointment confirmedAppointment = service.saveAppointment(appointment);
+            final AppointmentModel appointmentModel = converter.toModel(confirmedAppointment);
+            appointmentModel.add(self, finishLink, cancelLink, aggregateRoot);
+            return ResponseEntity.status(HttpStatus.OK).body(appointmentModel);
         }
 
         final NotAllowedResponse response =
@@ -143,8 +151,10 @@ public class AppointmentController {
 
         if (appointment.getStatus() == Status.CONFIRMED) {
             appointment.setStatus(Status.FINISHED);
-            Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
-            return ResponseEntity.ok(converter.toModel(service.saveAppointment(appointment)).add(self, aggregateRoot));
+            final Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
+            final AppointmentModel appointmentModel = converter.toModel(appointment);
+            appointmentModel.add(self, aggregateRoot);
+            return ResponseEntity.status(HttpStatus.OK).body(appointmentModel);
         }
 
         final NotAllowedResponse response =
@@ -160,8 +170,10 @@ public class AppointmentController {
 
         if (appointment.getStatus() == Status.PAYMENT_PENDING || appointment.getStatus() == Status.CONFIRMED) {
             appointment.setStatus(Status.CANCELLED);
-            Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
-            return ResponseEntity.ok(converter.toModel(service.saveAppointment(appointment)).add(self, aggregateRoot));
+            final Link self = linkTo(methodOn(controller).getAppointmentById(appointment.getId())).withSelfRel();
+            final AppointmentModel appointmentModel = converter.toModel(appointment);
+            appointmentModel.add(self, aggregateRoot);
+            return ResponseEntity.status(HttpStatus.OK).body(appointmentModel);
         }
 
         final NotAllowedResponse response =
