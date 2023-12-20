@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.security;
+package augusto108.ces.appointmenttracker.security.entities;
 
 import augusto108.ces.appointmenttracker.security.enums.Role;
 import lombok.*;

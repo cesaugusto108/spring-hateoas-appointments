@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.services;
 
-import augusto108.ces.appointmenttracker.security.EmployeeRole;
+import augusto108.ces.appointmenttracker.security.entities.EmployeeRole;
 import augusto108.ces.appointmenttracker.security.enums.Role;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

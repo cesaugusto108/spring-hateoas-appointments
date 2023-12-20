@@ -1,6 +1,6 @@
 package augusto108.ces.appointmenttracker.repositories;
 
-import augusto108.ces.appointmenttracker.security.Employee;
+import augusto108.ces.appointmenttracker.security.entities.Employee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

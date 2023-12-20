@@ -1,8 +1,8 @@
 package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.repositories.EmployeeRepository;
-import augusto108.ces.appointmenttracker.security.Employee;
-import augusto108.ces.appointmenttracker.security.EmployeeRole;
+import augusto108.ces.appointmenttracker.security.entities.Employee;
+import augusto108.ces.appointmenttracker.security.entities.EmployeeRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

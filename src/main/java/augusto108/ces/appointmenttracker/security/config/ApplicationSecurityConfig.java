@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.security;
+package augusto108.ces.appointmenttracker.security.config;
 
 import augusto108.ces.appointmenttracker.services.EmployeeRoleService;
 import augusto108.ces.appointmenttracker.services.EmployeeService;
@@ -38,9 +38,9 @@ public class ApplicationSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeRequests(registry -> registry
-                        .antMatchers(HttpMethod.GET).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN", "TRAINEE")
-                        .antMatchers(HttpMethod.POST).hasAnyRole("MANAGER", "ADMIN")
-                        .antMatchers(HttpMethod.PATCH).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN"));
+                .antMatchers(HttpMethod.GET).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN", "TRAINEE")
+                .antMatchers(HttpMethod.POST).hasAnyRole("MANAGER", "ADMIN")
+                .antMatchers(HttpMethod.PATCH).hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN"));
 
         httpSecurity.httpBasic();
         httpSecurity.csrf().disable();

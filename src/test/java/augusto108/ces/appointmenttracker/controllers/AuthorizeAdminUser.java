@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.controllers;
 
-import augusto108.ces.appointmenttracker.security.Employee;
-import augusto108.ces.appointmenttracker.security.EmployeeRole;
+import augusto108.ces.appointmenttracker.security.entities.Employee;
+import augusto108.ces.appointmenttracker.security.entities.EmployeeRole;
 import augusto108.ces.appointmenttracker.security.enums.Role;
 import augusto108.ces.appointmenttracker.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;

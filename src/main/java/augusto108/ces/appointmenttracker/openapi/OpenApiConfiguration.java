@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.config;
+package augusto108.ces.appointmenttracker.openapi;
 
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import io.swagger.v3.oas.models.OpenAPI;

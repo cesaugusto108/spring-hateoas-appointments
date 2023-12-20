@@ -1,7 +1,7 @@
 package augusto108.ces.appointmenttracker.services;
 
 import augusto108.ces.appointmenttracker.repositories.EmployeeRoleRepository;
-import augusto108.ces.appointmenttracker.security.EmployeeRole;
+import augusto108.ces.appointmenttracker.security.entities.EmployeeRole;
 import augusto108.ces.appointmenttracker.security.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

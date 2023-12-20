@@ -1,4 +1,4 @@
-package augusto108.ces.appointmenttracker.security;
+package augusto108.ces.appointmenttracker.security.entities;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
