@@ -7,6 +7,7 @@ import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +147,7 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
         appointment.setPatient(patientService.getPatient(1L));
         appointment.setPhysician(physicianService.getPhysician(2L));
 
-        mockMvc.perform(post(VersioningConstant.VERSION + "/appointments")
+        final MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/appointments")
                         .with(makeAuthorizedAdminUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(appointment)))
@@ -154,7 +155,13 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.patient.email", is("pedro@email.com")))
                 .andExpect(jsonPath("$.physician.specialty", is("DERMATOLOGIST")))
-                .andExpect(jsonPath("$.status", is("PAYMENT_PENDING")));
+                .andExpect(jsonPath("$.status", is("PAYMENT_PENDING")))
+                .andReturn();
+
+        final Appointment savedAppointment = objectMapper.readerFor(Appointment.class).readValue(result.getResponse().getContentAsString());
+        final String locationHeader = result.getResponse().getHeader("Location");
+        final String uri = "http://localhost" + VersioningConstant.VERSION + "/appointments/" + savedAppointment.getId();
+        Assertions.assertEquals(uri, locationHeader);
     }
 
     @Test

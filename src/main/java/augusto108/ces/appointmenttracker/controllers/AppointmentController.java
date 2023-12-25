@@ -20,11 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -106,11 +109,11 @@ public class AppointmentController {
         appointment.setStatus(Status.PAYMENT_PENDING);
         final Appointment savedAppointment = service.saveAppointment(appointment);
 
-        Patient patient = patientService.getPatient(savedAppointment.getPatient().getId());
+        final Patient patient = patientService.getPatient(savedAppointment.getPatient().getId());
         patient.getAppointments().add(savedAppointment);
         patientService.savePatient(patient);
 
-        Physician physician = physicianService.getPhysician(savedAppointment.getPhysician().getId());
+        final Physician physician = physicianService.getPhysician(savedAppointment.getPhysician().getId());
         physician.getAppointments().add(savedAppointment);
         physicianService.savePhysician(physician);
 
@@ -119,7 +122,8 @@ public class AppointmentController {
         final Link cancelLink = linkTo(methodOn(controller).cancelAppointment(savedAppointment.getId())).withRel("cancel");
         final AppointmentModel appointmentModel = converter.toModel(savedAppointment);
         appointmentModel.add(self, confirmLink, cancelLink, aggregateRoot);
-        return ResponseEntity.status(201).body(appointmentModel);
+        final URI uri = appointmentModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
+        return ResponseEntity.status(201).location(uri).body(appointmentModel);
     }
 
     @Operation(summary = "confirm appointment")
