@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -161,7 +162,7 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
         final Appointment savedAppointment = objectMapper.readerFor(Appointment.class).readValue(result.getResponse().getContentAsString());
         final String locationHeader = result.getResponse().getHeader("Location");
         final String uri = "http://localhost" + VersioningConstant.VERSION + "/appointments/" + savedAppointment.getId();
-        Assertions.assertEquals(uri, locationHeader);
+        assertEquals(uri, locationHeader);
     }
 
     @Test

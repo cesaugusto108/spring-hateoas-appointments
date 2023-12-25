@@ -14,11 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -90,6 +93,7 @@ public class PatientController {
         final Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
         final PatientModel patientModel = converter.toModel(savedPatient);
         patientModel.add(self, aggregateRoot);
-        return ResponseEntity.status(201).body(patientModel);
+        final URI uri = patientModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
+        return ResponseEntity.status(201).location(uri).body(patientModel);
     }
 }

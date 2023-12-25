@@ -4,6 +4,7 @@ import augusto108.ces.appointmenttracker.model.entities.Patient;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -125,13 +127,19 @@ class PatientControllerTest extends AuthorizeAdminUser {
         patient.setLastName("Ribeiro");
         patient.setEmail("leonardo@email.com");
 
-        mockMvc.perform(post(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
+        MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patient)))
-                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(status().isCreated())
+                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(jsonPath("$.firstName", is("Leonardo")))
                 .andExpect(jsonPath("$.lastName", is("Ribeiro")))
-                .andExpect(jsonPath("$.email", is("leonardo@email.com")));
+                .andExpect(jsonPath("$.email", is("leonardo@email.com")))
+                .andReturn();
+
+        final Patient savedPatient = objectMapper.readerFor(Patient.class).readValue(result.getResponse().getContentAsString());
+        final String locationHeader = result.getResponse().getHeader("Location");
+        final String uri = "http://localhost" + VersioningConstant.VERSION + "/patients/" + savedPatient.getId();
+        assertEquals(uri, locationHeader);
     }
 }
