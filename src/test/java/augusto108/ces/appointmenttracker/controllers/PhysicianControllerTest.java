@@ -128,13 +128,19 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
         physician.setLastName("Muntz");
         physician.setSpecialty(Specialty.ENDOCRINOLOGIST);
 
-        mockMvc.perform(post(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
+        final MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(physician)))
                 .andExpect(content().contentType("application/hal+json"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstName", is("Nelson")))
                 .andExpect(jsonPath("$.lastName", is("Muntz")))
-                .andExpect(jsonPath("$.specialty", is("ENDOCRINOLOGIST")));
+                .andExpect(jsonPath("$.specialty", is("ENDOCRINOLOGIST")))
+                .andReturn();
+
+        final Physician savedPhysician = objectMapper.readerFor(Physician.class).readValue(result.getResponse().getContentAsString());
+        final String locationHeader = result.getResponse().getHeader("Location");
+        final String uri = "http://localhost" + VersioningConstant.VERSION + "/physicians/" + savedPhysician.getId();
+        assertEquals(uri, locationHeader);
     }
 }
