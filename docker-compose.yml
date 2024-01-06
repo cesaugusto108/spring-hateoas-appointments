@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysql:8.0.33-debian
+    container_name: guestsapp-db
+    command: [ "mysqld", "--default-authentication-plugin=mysql_native_password" ]
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: ${PASSWORD}
+      MYSQL_DATABASE: appointments_tracker_dev
+      MYSQL_TCP_PORT: 3308
+    expose: [ 3308 ]
+    networks: [ appointmentsapp-network ]
+
+  appointmentsapp:
+    image: appointmentsapp
+    container_name: appointmentsapp
+    depends_on: [ db ]
+    restart: on-failure
+    build: .
+    environment:
+      SPRING.DATASOURCE.URL: jdbc:mysql://db:3308/appointments_tracker_dev?useTimezone=true&serverTimezone=UTC
+      SPRING.DATASOURCE.USERNAME: root
+      SPRING.DATASOURCE.PASSWORD: ${PASSWORD}
+      SPRING.PROFILES.ACTIVE: ${ACTIVE_PROFILES}
+      SERVER.PORT: 80
+      USERS.PWORD: ${EMP_PWORD}
+    ports: [ 8089:80 ]
+    networks: [ appointmentsapp-network ]
+
+networks:
+  appointmentsapp-network:
+    driver: bridge
