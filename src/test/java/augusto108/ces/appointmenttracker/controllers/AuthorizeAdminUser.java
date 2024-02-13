@@ -18,11 +18,12 @@ import java.util.List;
 @PropertySource(value = "classpath:users.properties")
 public abstract class AuthorizeAdminUser {
 
-    @Autowired
-    private EmployeeService employeeService;
-
     @Value("${users.pword}")
     private String empPassword;
+
+    @Autowired
+    protected AuthorizeAdminUser(EmployeeService employeeService) {
+    }
 
     protected RequestPostProcessor makeAuthorizedAdminUser() {
         final EmployeeRole employeeRole = new EmployeeRole();

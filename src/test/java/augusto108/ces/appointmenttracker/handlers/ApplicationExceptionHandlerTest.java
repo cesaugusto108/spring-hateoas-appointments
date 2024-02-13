@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.handlers;
 
 import augusto108.ces.appointmenttracker.controllers.AuthorizeAdminUser;
+import augusto108.ces.appointmenttracker.services.EmployeeService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,17 @@ class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext context;
+    private final WebApplicationContext context;
+    private final Filter springSecurityFilterChain;
 
     @Autowired
-    private Filter springSecurityFilterChain;
+    ApplicationExceptionHandlerTest(WebApplicationContext context,
+                                    Filter springSecurityFilterChain,
+                                    EmployeeService employeeService) {
+        super(employeeService);
+        this.context = context;
+        this.springSecurityFilterChain = springSecurityFilterChain;
+    }
 
     @BeforeEach
     void setUp() {

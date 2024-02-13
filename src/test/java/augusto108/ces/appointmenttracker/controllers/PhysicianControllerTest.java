@@ -2,6 +2,7 @@ package augusto108.ces.appointmenttracker.controllers;
 
 import augusto108.ces.appointmenttracker.model.entities.Physician;
 import augusto108.ces.appointmenttracker.model.enums.Specialty;
+import augusto108.ces.appointmenttracker.services.EmployeeService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -36,17 +37,23 @@ class PhysicianControllerTest extends AuthorizeAdminUser {
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private Filter springSecurityFilterChain;
+    private final WebApplicationContext context;
+    private final ObjectMapper objectMapper;
+    private final Filter springSecurityFilterChain;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    PhysicianControllerTest(WebApplicationContext context,
+                            ObjectMapper objectMapper,
+                            Filter springSecurityFilterChain,
+                            EmployeeService employeeService) {
+        super(employeeService);
+        this.context = context;
+        this.objectMapper = objectMapper;
+        this.springSecurityFilterChain = springSecurityFilterChain;
+    }
 
     @BeforeEach
     void setUp() {

@@ -20,11 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 class EmployeeRoleServiceImplTest {
 
-    @Autowired
-    private EmployeeRoleService employeeRoleService;
+    private final EmployeeRoleService employeeRoleService;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    EmployeeRoleServiceImplTest(EmployeeRoleService employeeRoleService) {
+        this.employeeRoleService = employeeRoleService;
+    }
 
     @BeforeEach
     void setUp() {

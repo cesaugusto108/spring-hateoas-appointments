@@ -3,6 +3,7 @@ package augusto108.ces.appointmenttracker.controllers;
 import augusto108.ces.appointmenttracker.model.entities.Appointment;
 import augusto108.ces.appointmenttracker.model.enums.Status;
 import augusto108.ces.appointmenttracker.services.AppointmentService;
+import augusto108.ces.appointmenttracker.services.EmployeeService;
 import augusto108.ces.appointmenttracker.services.PatientService;
 import augusto108.ces.appointmenttracker.services.PhysicianService;
 import augusto108.ces.appointmenttracker.util.VersioningConstant;
@@ -37,26 +38,32 @@ class AppointmentControllerTest extends AuthorizeAdminUser {
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private Filter springSecurityFilterChain;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private PhysicianService physicianService;
-
-    @Autowired
-    private AppointmentService appointmentService;
+    private final WebApplicationContext context;
+    private final Filter springSecurityFilterChain;
+    private final ObjectMapper objectMapper;
+    private final PatientService patientService;
+    private final PhysicianService physicianService;
+    private final AppointmentService appointmentService;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    AppointmentControllerTest(WebApplicationContext context,
+                              Filter springSecurityFilterChain,
+                              ObjectMapper objectMapper,
+                              PatientService patientService,
+                              PhysicianService physicianService,
+                              AppointmentService appointmentService,
+                              EmployeeService employeeService) {
+        super(employeeService);
+        this.context = context;
+        this.springSecurityFilterChain = springSecurityFilterChain;
+        this.objectMapper = objectMapper;
+        this.patientService = patientService;
+        this.physicianService = physicianService;
+        this.appointmentService = appointmentService;
+    }
 
     @BeforeEach
     void setUp() {

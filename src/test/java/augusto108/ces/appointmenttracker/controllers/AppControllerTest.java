@@ -22,11 +22,12 @@ class AppControllerTest {
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private AppController appController;
+    private final WebApplicationContext context;
 
     @Autowired
-    private WebApplicationContext context;
+    AppControllerTest(WebApplicationContext context) {
+        this.context = context;
+    }
 
     @BeforeEach
     void setUp() {

@@ -22,17 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class AppointmentServiceImplTest {
 
-    @Autowired
-    private AppointmentService appointmentService;
-
-    @Autowired
-    private PatientService patientService;
-
-    @Autowired
-    private PhysicianService physicianService;
+    private final AppointmentService appointmentService;
+    private final PatientService patientService;
+    private final PhysicianService physicianService;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    AppointmentServiceImplTest(AppointmentService appointmentService,
+                               PatientService patientService,
+                               PhysicianService physicianService) {
+        this.appointmentService = appointmentService;
+        this.patientService = patientService;
+        this.physicianService = physicianService;
+    }
 
     @BeforeEach
     void setUp() {

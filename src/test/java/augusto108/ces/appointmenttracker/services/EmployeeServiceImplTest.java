@@ -22,14 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 class EmployeeServiceImplTest {
 
-    @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private EmployeeRoleService employeeRoleService;
+    private final EmployeeService employeeService;
+    private final EmployeeRoleService employeeRoleService;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    EmployeeServiceImplTest(EmployeeService employeeService, EmployeeRoleService employeeRoleService) {
+        this.employeeService = employeeService;
+        this.employeeRoleService = employeeRoleService;
+    }
 
     @BeforeEach
     void setUp() {
