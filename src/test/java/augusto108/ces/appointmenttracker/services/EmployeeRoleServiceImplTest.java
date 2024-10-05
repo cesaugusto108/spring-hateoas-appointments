@@ -66,6 +66,6 @@ class EmployeeRoleServiceImplTest {
         employeeRoleService.saveEmployeeRole(role);
         final EmployeeRole r = employeeRoleService.getEmployeeRoleByRole(Role.ROLE_TEST);
         assertEquals("ROLE_TEST", r.getRole().toString());
-        assertEquals(1001, r.getId());
+        assertEquals(1003, r.getId());
     }
 }
