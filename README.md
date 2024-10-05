@@ -1,14 +1,96 @@
-# spring-hateoas-appointments
-
+# appointments
 Study project for Spring Boot, HATEOAS and Spring Data Pagination
 
 ## Description
+This is a Spring Boot application that works as a RESTful API. Through the endpoints of the application it is possible to send HTTP requests to fetch and save data. MySQL database is used.
 
-This is a Spring Boot application that works as a RESTful API. Through the endpoints of the application it is possible
-to send HTTP requests to fetch and save data. MySQL database is used.
+Results are presented with pagination and sorting and with links to other pages. Links serve as access to other results and to the first, current, next and last pages.
 
-Results are presented with pagination and sorting and with links to other pages. Links serve as access to other results
-and to the first, current, next and last pages.
+## Features
+- CRUD operations for appointment management
+- Full API documentation available via Swagger
+- Spring Security authentication and authorization
+
+## Prerequisites
+Before you begin, ensure you have the following installed on your machine:
+- [Git](https://git-scm.com)
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Java JDK 17+](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html) (if not using Docker)
+
+## Getting Started
+
+### Clone the Repository
+To get a local copy of the project, run the following command in your terminal:
+
+```bash
+git clone git@github.com:cesaugusto108/spring-hateoas-appointments.git
+cd spring-hateoas-appointments
+```
+
+### Setting Up the Environment with Docker
+
+1. **Create a Docker Network** (optional):
+   ```bash
+   docker network create appointmentsapp-network
+   ```
+2. **Create a .env file**
+   The .env file should contain the PASSWORD, ACTIVE_PROFILES and EMP_PWORD keys.
+   Example:
+   PASSWORD=1234
+   ACTIVE_PROFILES=dev
+   EMP_PWORD=1234
+   
+   ```bash
+   vim .env
+   ```
+3. **Use Maven Wrapper to build the application**
+   ```bash
+   ./mvnw clean package -DEMPPASSWORD=1234
+   ```
+
+   Or this, to skip tests:
+   ```
+   ./mvnw clean package -DskipTests
+   ```
+4. **Build and Run the Application**:
+   Use Docker Compose to build and run the application:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   If it fails on Windows, disable BuildKit temporarily using this instead:
+
+   ```bash
+   DOCKER_BUILDKIT=0 docker-compose up --build
+   ```
+
+### Running the Application Locally (without Docker)
+If you prefer to run the application locally without Docker, follow these steps:
+
+1. **Navigate to Project Directory**:
+   ```bash
+   cd spring-hateoas-appointments
+   ```
+
+2. **Run with Maven**:
+   Use the following command to start the application (dev profile) with necessary arguments (replace details where necessary):
+
+   ```bash
+   ./mvnw spring-boot:run -Dspring-boot.run.arguments="--ACTIVE_PROFILES=dev --SERVER-PORT=8089 --DB-HOST=localhost --DB-PORT=3306 --DB-USERNAME=admin --DB-PASSWORD=1234"
+   ```
+
+   There should be a running MySQL service on your computer with a schema named `appointments_tracker_dev`.
+
+## Accessing the API Documentation
+Once the application is running, you can access the full API documentation via Swagger at:
+
+[http://localhost:8089/appointment-tracker/dev/swagger-ui/index.html](http://localhost:8089/appointment-tracker/dev/swagger-ui/index.html)
+
+## Author
+César Augusto Silva  
+cesaraugustosilva@proton.me
 
 ## Entities model
 
