@@ -88,8 +88,8 @@ If you prefer to run the application locally without Docker, follow these steps:
 ## Accessing an endpoint
 Once the application is running, you can access an endpoint such as `http://localhost:8089/appointment-tracker/dev/api/v1/physicians` (See API documentation). When login and password are requested:
 
-login: monteiro
-password: 1234
+- login: monteiro
+- password: 1234
 
 ## Accessing the API Documentation
 Once the application is running, you can access the full API documentation via Swagger at:
