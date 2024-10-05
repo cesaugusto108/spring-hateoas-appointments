@@ -9,7 +9,9 @@ Results are presented with pagination and sorting and with links to other pages.
 ## Features
 - CRUD operations for appointment management
 - Full API documentation available via Swagger
+- Spring HATEOAS
 - Spring Security authentication and authorization
+- Flyway migration
 
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:
@@ -82,6 +84,12 @@ If you prefer to run the application locally without Docker, follow these steps:
    ```
 
    There should be a running MySQL service on your computer with a schema named `appointments_tracker_dev`.
+
+## Accessing an endpoint
+Once the application is running, you can access an endpoint such as `http://localhost:8089/appointment-tracker/dev/api/v1/physicians` (See API documentation). When login and password are requested:
+
+login: monteiro
+password: 1234
 
 ## Accessing the API Documentation
 Once the application is running, you can access the full API documentation via Swagger at:
