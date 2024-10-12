@@ -10,17 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EmployeeRoleServiceImpl implements EmployeeRoleService {
+public class EmployeeRoleServiceImpl implements EmployeeRoleService
+{
 
-    private final EmployeeRoleRepository repository;
+	private final EmployeeRoleRepository repository;
 
-    @Override
-    public EmployeeRole getEmployeeRoleByRole(Role role) {
-        return repository.getEmployeeRolebyRole(role);
-    }
+	@Override
+	public EmployeeRole getEmployeeRoleByRole(Role role)
+	{
+		return repository.getEmployeeRolebyRole(role);
+	}
 
-    @Override
-    public void saveEmployeeRole(EmployeeRole employeeRole) {
-        repository.saveEmployeeRole(employeeRole);
-    }
+	@Override
+	public void saveEmployeeRole(EmployeeRole employeeRole)
+	{
+		repository.saveEmployeeRole(employeeRole);
+	}
 }

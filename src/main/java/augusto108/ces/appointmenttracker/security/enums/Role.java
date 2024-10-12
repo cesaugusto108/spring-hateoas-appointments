@@ -1,6 +1,7 @@
 package augusto108.ces.appointmenttracker.security.enums;
 
-public enum Role {
+public enum Role
+{
 
-    ROLE_ADMIN, ROLE_EMPLOYEE, ROLE_MANAGER, ROLE_TRAINEE, ROLE_TEST
+	ROLE_ADMIN, ROLE_EMPLOYEE, ROLE_MANAGER, ROLE_TRAINEE, ROLE_TEST
 }

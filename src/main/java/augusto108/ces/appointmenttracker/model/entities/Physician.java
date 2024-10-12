@@ -14,24 +14,25 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, of = {})
 @Entity
 @Table(name = "tb_physician")
-public class Physician extends Person {
+public class Physician extends Person
+{
 
-    @Setter
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "specialty")
-    private Specialty specialty;
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "tb_physician_appointment",
+		joinColumns = @JoinColumn(name = "physician_id"),
+		inverseJoinColumns = @JoinColumn(name = "appointment_id")
+	)
+	private final Set<Appointment> appointments = new HashSet<>();
+	@Setter
+	@Enumerated(value = EnumType.STRING)
+	@Column(name = "specialty")
+	private Specialty specialty;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "tb_physician_appointment",
-            joinColumns = @JoinColumn(name = "physician_id"),
-            inverseJoinColumns = @JoinColumn(name = "appointment_id")
-    )
-    private final Set<Appointment> appointments = new HashSet<>();
-
-    @Override
-    public String toString() {
-        return getFirstName() + " " + getLastName() + " (" + getSpecialty().toString() + ")";
-    }
+	@Override
+	public String toString()
+	{
+		return getFirstName() + " " + getLastName() + " (" + getSpecialty().toString() + ")";
+	}
 }

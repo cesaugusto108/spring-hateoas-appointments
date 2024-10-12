@@ -30,70 +30,75 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping(VersioningConstant.VERSION + "/patients")
 @RequiredArgsConstructor
-public class PatientController {
+public class PatientController
+{
 
-    private final PatientService service;
-    private final PatientModelConverter converter;
-    private final PagedResourcesAssembler<Patient> resourcesAssembler;
-    private final PatientEntityModelAssembler modelAssembler;
+	private final PatientService service;
+	private final PatientModelConverter converter;
+	private final PagedResourcesAssembler<Patient> resourcesAssembler;
+	private final PatientEntityModelAssembler modelAssembler;
 
-    private final Class<PatientController> controller = PatientController.class;
-    private final DefaultParameterObj param = new DefaultParameterObj();
+	private final Class<PatientController> controller = PatientController.class;
+	private final DefaultParameterObj param = new DefaultParameterObj();
 
-    private final Link aggregateRoot =
-            linkTo(methodOn(controller)
-                    .getPatients(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
-                    .withRel("patients");
+	private final Link aggregateRoot =
+		linkTo(methodOn(controller)
+			.getPatients(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
+			.withRel("patients");
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "get patients")
-    @GetMapping(value = "", produces = "application/hal+json")
-    public ResponseEntity<PagedModel<EntityModel<Patient>>> getPatients(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-            @RequestParam(defaultValue = "id") String field
-    ) {
-        final Page<Patient> patients = service.findAll(page, size, direction, field);
-        final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
-        return ResponseEntity.status(200).body(pagedModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "get patients")
+	@GetMapping(value = "", produces = "application/hal+json")
+	public ResponseEntity<PagedModel<EntityModel<Patient>>> getPatients(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "5") int size,
+		@RequestParam(defaultValue = "ASC") Sort.Direction direction,
+		@RequestParam(defaultValue = "id") String field
+	)
+	{
+		final Page<Patient> patients = service.findAll(page, size, direction, field);
+		final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
+		return ResponseEntity.status(200).body(pagedModel);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "search patients")
-    @GetMapping(value = "/search", produces = "application/hal+json")
-    public ResponseEntity<PagedModel<EntityModel<Patient>>> searchPatients(
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-            @RequestParam(defaultValue = "id") String field
-    ) {
-        final Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size, direction, field);
-        final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
-        return ResponseEntity.status(200).body(pagedModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "search patients")
+	@GetMapping(value = "/search", produces = "application/hal+json")
+	public ResponseEntity<PagedModel<EntityModel<Patient>>> searchPatients(
+		@RequestParam(defaultValue = "") String search,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "5") int size,
+		@RequestParam(defaultValue = "ASC") Sort.Direction direction,
+		@RequestParam(defaultValue = "id") String field
+	)
+	{
+		final Page<Patient> patients = service.findPatientByNameLikeOrEmailLike(search, page, size, direction, field);
+		final PagedModel<EntityModel<Patient>> pagedModel = resourcesAssembler.toModel(patients, modelAssembler);
+		return ResponseEntity.status(200).body(pagedModel);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "get patient by id")
-    @GetMapping(value = "/{id}", produces = "application/hal+json")
-    public ResponseEntity<PatientModel> getPatientById(@PathVariable("id") Long id) {
-        final Link self = linkTo(methodOn(controller).getPatientById(id)).withSelfRel();
-        final Patient patient = service.getPatient(id);
-        final PatientModel patientModel = converter.toModel(patient);
-        patientModel.add(self, aggregateRoot);
-        return ResponseEntity.status(200).body(patientModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "get patient by id")
+	@GetMapping(value = "/{id}", produces = "application/hal+json")
+	public ResponseEntity<PatientModel> getPatientById(@PathVariable("id") Long id)
+	{
+		final Link self = linkTo(methodOn(controller).getPatientById(id)).withSelfRel();
+		final Patient patient = service.getPatient(id);
+		final PatientModel patientModel = converter.toModel(patient);
+		patientModel.add(self, aggregateRoot);
+		return ResponseEntity.status(200).body(patientModel);
+	}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "save patient")
-    @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
-    public ResponseEntity<PatientModel> savePatient(@RequestBody Patient patient) {
-        final Patient savedPatient = service.savePatient(patient);
-        final Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
-        final PatientModel patientModel = converter.toModel(savedPatient);
-        patientModel.add(self, aggregateRoot);
-        final URI uri = patientModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
-        return ResponseEntity.status(201).location(uri).body(patientModel);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(summary = "save patient")
+	@PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
+	public ResponseEntity<PatientModel> savePatient(@RequestBody Patient patient)
+	{
+		final Patient savedPatient = service.savePatient(patient);
+		final Link self = linkTo(methodOn(controller).getPatientById(savedPatient.getId())).withSelfRel();
+		final PatientModel patientModel = converter.toModel(savedPatient);
+		patientModel.add(self, aggregateRoot);
+		final URI uri = patientModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
+		return ResponseEntity.status(201).location(uri).body(patientModel);
+	}
 }

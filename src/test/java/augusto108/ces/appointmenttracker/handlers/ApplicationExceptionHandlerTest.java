@@ -22,47 +22,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("sec")
-class ApplicationExceptionHandlerTest extends AuthorizeAdminUser {
+class ApplicationExceptionHandlerTest extends AuthorizeAdminUser
+{
 
-    private MockMvc mockMvc;
+	private final WebApplicationContext context;
+	private final Filter springSecurityFilterChain;
+	private MockMvc mockMvc;
 
-    private final WebApplicationContext context;
-    private final Filter springSecurityFilterChain;
+	@Autowired ApplicationExceptionHandlerTest(WebApplicationContext context,
+																						 Filter springSecurityFilterChain,
+																						 EmployeeService employeeService)
+	{
+		super(employeeService);
+		this.context = context;
+		this.springSecurityFilterChain = springSecurityFilterChain;
+	}
 
-    @Autowired
-    ApplicationExceptionHandlerTest(WebApplicationContext context,
-                                    Filter springSecurityFilterChain,
-                                    EmployeeService employeeService) {
-        super(employeeService);
-        this.context = context;
-        this.springSecurityFilterChain = springSecurityFilterChain;
-    }
+	@BeforeEach
+	void setUp()
+	{
+		mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
+	}
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
-    }
+	@Test
+	void handleNotFoundException() throws Exception
+	{
+		mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/{id}", 0).with(makeAuthorizedAdminUser()))
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andExpect(jsonPath("$.status", is("NOT_FOUND")))
+			.andExpect(jsonPath("$.statusCode", is(404)));
+	}
 
-    @Test
-    void handleNotFoundException() throws Exception {
-        mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/{id}", 0).with(makeAuthorizedAdminUser()))
-                .andExpect(status().isNotFound())
-                .andDo(print())
-                .andExpect(jsonPath("$.status", is("NOT_FOUND")))
-                .andExpect(jsonPath("$.statusCode", is(404)));
-    }
+	@Test
+	void handleBadRequest() throws Exception
+	{
+		final String error = "java.lang.NumberFormatException: For input string: \"aaa\"";
+		final String message = "Wrong property format: For input string: \"aaa\"";
 
-    @Test
-    void handleBadRequest() throws Exception {
-        final String error = "java.lang.NumberFormatException: For input string: \"aaa\"";
-        final String message = "Wrong property format: For input string: \"aaa\"";
-
-        mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/aaa").with(makeAuthorizedAdminUser()))
-                .andExpect(status().isBadRequest())
-                .andDo(print())
-                .andExpect(jsonPath("$.error", is(String.format("%s", error))))
-                .andExpect(jsonPath("$.message", is(String.format("%s", message))))
-                .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-                .andExpect(jsonPath("$.statusCode", is(400)));
-    }
+		mockMvc.perform(get(VersioningConstant.VERSION + "/appointments/aaa").with(makeAuthorizedAdminUser()))
+			.andExpect(status().isBadRequest())
+			.andDo(print())
+			.andExpect(jsonPath("$.error", is(String.format("%s", error))))
+			.andExpect(jsonPath("$.message", is(String.format("%s", message))))
+			.andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+			.andExpect(jsonPath("$.statusCode", is(400)));
+	}
 }

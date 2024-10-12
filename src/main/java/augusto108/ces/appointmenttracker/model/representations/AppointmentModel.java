@@ -11,10 +11,11 @@ import org.springframework.hateoas.RepresentationModel;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, of = {})
-public class AppointmentModel extends RepresentationModel<AppointmentModel> {
+public class AppointmentModel extends RepresentationModel<AppointmentModel>
+{
 
-    private Long id;
-    private Patient patient;
-    private Physician physician;
-    private Status status;
+	private Long id;
+	private Patient patient;
+	private Physician physician;
+	private Status status;
 }

@@ -13,23 +13,24 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true, of = {})
 @Entity
 @Table(name = "tb_patient")
-public class Patient extends Person {
+public class Patient extends Person
+{
 
-    @Setter
-    @Column(name = "email", length = 100)
-    private String email;
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "tb_patient_appointment",
+		joinColumns = @JoinColumn(name = "patient_id"),
+		inverseJoinColumns = @JoinColumn(name = "appointment_id")
+	)
+	private final Set<Appointment> appointments = new HashSet<>();
+	@Setter
+	@Column(name = "email", length = 100)
+	private String email;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "tb_patient_appointment",
-            joinColumns = @JoinColumn(name = "patient_id"),
-            inverseJoinColumns = @JoinColumn(name = "appointment_id")
-    )
-    private final Set<Appointment> appointments = new HashSet<>();
-
-    @Override
-    public String toString() {
-        return getFirstName() + " " + getLastName() + " (" + getEmail() + ")";
-    }
+	@Override
+	public String toString()
+	{
+		return getFirstName() + " " + getLastName() + " (" + getEmail() + ")";
+	}
 }

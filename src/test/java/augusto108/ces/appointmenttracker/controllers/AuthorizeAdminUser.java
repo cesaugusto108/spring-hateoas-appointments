@@ -16,30 +16,33 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import java.util.List;
 
 @PropertySource(value = "classpath:users.properties")
-public abstract class AuthorizeAdminUser {
+public abstract class AuthorizeAdminUser
+{
 
-    @Value("${users.pword}")
-    private String empPassword;
+	@Value("${users.pword}")
+	private String empPassword;
 
-    @Autowired
-    protected AuthorizeAdminUser(EmployeeService employeeService) {
-    }
+	@Autowired
+	protected AuthorizeAdminUser(EmployeeService employeeService)
+	{
+	}
 
-    protected RequestPostProcessor makeAuthorizedAdminUser() {
-        final EmployeeRole employeeRole = new EmployeeRole();
-        employeeRole.setRole(Role.ROLE_ADMIN);
-        employeeRole.setId(1L);
+	protected RequestPostProcessor makeAuthorizedAdminUser()
+	{
+		final EmployeeRole employeeRole = new EmployeeRole();
+		employeeRole.setRole(Role.ROLE_ADMIN);
+		employeeRole.setId(1L);
 
-        final Employee employee = new Employee();
-        employee.setUsername("santos");
-        employee.setPassword(empPassword);
-        employee.setActive(true);
-        employee.setRoles(List.of(employeeRole));
-        employee.setId(1L);
+		final Employee employee = new Employee();
+		employee.setUsername("santos");
+		employee.setPassword(empPassword);
+		employee.setActive(true);
+		employee.setRoles(List.of(employeeRole));
+		employee.setId(1L);
 
-        return SecurityMockMvcRequestPostProcessors.user(
-                new User(employee.getUsername(),
-                        new BCryptPasswordEncoder().encode(empPassword),
-                        List.of(new SimpleGrantedAuthority(employee.getRoles().toArray()[0].toString()))));
-    }
+		return SecurityMockMvcRequestPostProcessors.user(
+			new User(employee.getUsername(),
+				new BCryptPasswordEncoder().encode(empPassword),
+				List.of(new SimpleGrantedAuthority(employee.getRoles().toArray()[0].toString()))));
+	}
 }

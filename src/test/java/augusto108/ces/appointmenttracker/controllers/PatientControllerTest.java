@@ -31,120 +31,125 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("sec")
 @Transactional
-class PatientControllerTest extends AuthorizeAdminUser {
+class PatientControllerTest extends AuthorizeAdminUser
+{
 
-    private MockMvc mockMvc;
+	private final WebApplicationContext context;
+	private final ObjectMapper objectMapper;
+	private final Filter springSecurityFilterChain;
+	private MockMvc mockMvc;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    private final WebApplicationContext context;
-    private final ObjectMapper objectMapper;
-    private final Filter springSecurityFilterChain;
+	@Autowired PatientControllerTest(WebApplicationContext context,
+																	 ObjectMapper objectMapper,
+																	 Filter springSecurityFilterChain,
+																	 EmployeeService employeeService)
+	{
+		super(employeeService);
+		this.context = context;
+		this.objectMapper = objectMapper;
+		this.springSecurityFilterChain = springSecurityFilterChain;
+	}
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@BeforeEach
+	void setUp()
+	{
+		mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
 
-    @Autowired
-    PatientControllerTest(WebApplicationContext context,
-                          ObjectMapper objectMapper,
-                          Filter springSecurityFilterChain,
-                          EmployeeService employeeService) {
-        super(employeeService);
-        this.context = context;
-        this.objectMapper = objectMapper;
-        this.springSecurityFilterChain = springSecurityFilterChain;
-    }
+		final String query = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
+			"    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilters(springSecurityFilterChain).build();
+		entityManager.createNativeQuery(query).executeUpdate();
+	}
 
-        final String query = "INSERT INTO `tb_patient` (`id`, `first_name`, `last_name`, `email`)\n" +
-                "    VALUES (1, 'Pedro', 'Cardoso', 'pedro@email.com');";
+	@AfterEach
+	void tearDown()
+	{
+		entityManager.createNativeQuery("delete from `tb_patient`;");
+	}
 
-        entityManager.createNativeQuery(query).executeUpdate();
-    }
+	@Test
+	void getPatients() throws Exception
+	{
+		final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients?page=0&size=20&sort=id,asc";
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("delete from `tb_patient`;");
-    }
+		MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
+				.param("page", "0")
+				.param("size", "20")
+				.param("direction", "ASC")
+				.param("field", "id"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.page.size", is(20)))
+			.andExpect(jsonPath("$.page.totalElements", is(1)))
+			.andExpect(jsonPath("$.page.totalPages", is(1)))
+			.andExpect(jsonPath("$.page.number", is(0)))
+			.andExpect(jsonPath("$._links.self.href", is(selfLink)))
+			.andReturn();
 
-    @Test
-    void getPatients() throws Exception {
-        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients?page=0&size=20&sort=id,asc";
+		final String content = result.getResponse().getContentAsString();
+		final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
+		assertEquals(3, pageJsonKeySetSize);
+	}
 
-        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
-                        .param("page", "0")
-                        .param("size", "20")
-                        .param("direction", "ASC")
-                        .param("field", "id"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$.page.totalPages", is(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._links.self.href", is(selfLink)))
-                .andReturn();
+	@Test
+	void searchPatients() throws Exception
+	{
+		final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients/search?page=0&size=20&sort=id,asc";
 
-        final String content = result.getResponse().getContentAsString();
-        final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-        assertEquals(3, pageJsonKeySetSize);
-    }
+		MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients/search").with(makeAuthorizedAdminUser())
+				.param("search", "Cardoso")
+				.param("page", "0")
+				.param("size", "20")
+				.param("direction", "ASC")
+				.param("field", "id"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.page.size", is(20)))
+			.andExpect(jsonPath("$.page.totalElements", is(1)))
+			.andExpect(jsonPath("$.page.totalPages", is(1)))
+			.andExpect(jsonPath("$.page.number", is(0)))
+			.andExpect(jsonPath("$._links.self.href", is(selfLink)))
+			.andReturn();
 
-    @Test
-    void searchPatients() throws Exception {
-        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/patients/search?page=0&size=20&sort=id,asc";
+		final String content = result.getResponse().getContentAsString();
+		final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
+		assertEquals(3, pageJsonKeySetSize);
+	}
 
-        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/patients/search").with(makeAuthorizedAdminUser())
-                        .param("search", "Cardoso")
-                        .param("page", "0")
-                        .param("size", "20")
-                        .param("direction", "ASC")
-                        .param("field", "id"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$.page.totalPages", is(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._links.self.href", is(selfLink)))
-                .andReturn();
+	@Test
+	void getPatientById() throws Exception
+	{
+		mockMvc.perform(get(VersioningConstant.VERSION + "/patients/{id}", 1).with(makeAuthorizedAdminUser()))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.firstName", is("Pedro")))
+			.andExpect(jsonPath("$.lastName", is("Cardoso")))
+			.andExpect(jsonPath("$.email", is("pedro@email.com")));
+	}
 
-        final String content = result.getResponse().getContentAsString();
-        final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-        assertEquals(3, pageJsonKeySetSize);
-    }
+	@Test
+	void savePatient() throws Exception
+	{
+		final Patient patient = new Patient();
+		patient.setFirstName("Leonardo");
+		patient.setLastName("Ribeiro");
+		patient.setEmail("leonardo@email.com");
 
-    @Test
-    void getPatientById() throws Exception {
-        mockMvc.perform(get(VersioningConstant.VERSION + "/patients/{id}", 1).with(makeAuthorizedAdminUser()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.firstName", is("Pedro")))
-                .andExpect(jsonPath("$.lastName", is("Cardoso")))
-                .andExpect(jsonPath("$.email", is("pedro@email.com")));
-    }
+		MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(patient)))
+			.andExpect(status().isCreated())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.firstName", is("Leonardo")))
+			.andExpect(jsonPath("$.lastName", is("Ribeiro")))
+			.andExpect(jsonPath("$.email", is("leonardo@email.com")))
+			.andReturn();
 
-    @Test
-    void savePatient() throws Exception {
-        final Patient patient = new Patient();
-        patient.setFirstName("Leonardo");
-        patient.setLastName("Ribeiro");
-        patient.setEmail("leonardo@email.com");
-
-        MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/patients").with(makeAuthorizedAdminUser())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patient)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.firstName", is("Leonardo")))
-                .andExpect(jsonPath("$.lastName", is("Ribeiro")))
-                .andExpect(jsonPath("$.email", is("leonardo@email.com")))
-                .andReturn();
-
-        final Patient savedPatient = objectMapper.readerFor(Patient.class).readValue(result.getResponse().getContentAsString());
-        final String locationHeader = result.getResponse().getHeader("Location");
-        final String uri = "http://localhost" + VersioningConstant.VERSION + "/patients/" + savedPatient.getId();
-        assertEquals(uri, locationHeader);
-    }
+		final Patient savedPatient = objectMapper.readerFor(Patient.class).readValue(result.getResponse().getContentAsString());
+		final String locationHeader = result.getResponse().getHeader("Location");
+		final String uri = "http://localhost" + VersioningConstant.VERSION + "/patients/" + savedPatient.getId();
+		assertEquals(uri, locationHeader);
+	}
 }

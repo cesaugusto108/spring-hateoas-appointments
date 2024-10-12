@@ -30,70 +30,75 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping(VersioningConstant.VERSION + "/physicians")
 @RequiredArgsConstructor
-public class PhysicianController {
+public class PhysicianController
+{
 
-    private final PhysicianService service;
-    private final PhysicianModelConverter converter;
-    private final PagedResourcesAssembler<Physician> resourcesAssembler;
-    private final PhysicianEntityModelAssembler modelAssembler;
+	private final PhysicianService service;
+	private final PhysicianModelConverter converter;
+	private final PagedResourcesAssembler<Physician> resourcesAssembler;
+	private final PhysicianEntityModelAssembler modelAssembler;
 
-    private final Class<PhysicianController> controller = PhysicianController.class;
-    private final DefaultParameterObj param = new DefaultParameterObj();
+	private final Class<PhysicianController> controller = PhysicianController.class;
+	private final DefaultParameterObj param = new DefaultParameterObj();
 
-    private final Link aggregateRoot =
-            linkTo(methodOn(controller)
-                    .getPhysicians(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
-                    .withRel("physicians");
+	private final Link aggregateRoot =
+		linkTo(methodOn(controller)
+			.getPhysicians(param.getPage(), param.getSize(), param.getDirection(), param.getField()))
+			.withRel("physicians");
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "get physicians")
-    @GetMapping(value = "", produces = "application/hal+json")
-    public ResponseEntity<PagedModel<EntityModel<Physician>>> getPhysicians(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-            @RequestParam(defaultValue = "id") String field
-    ) {
-        final Page<Physician> physicians = service.findAll(page, size, direction, field);
-        final PagedModel<EntityModel<Physician>> pagedModel = resourcesAssembler.toModel(physicians, modelAssembler);
-        return ResponseEntity.status(200).body(pagedModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "get physicians")
+	@GetMapping(value = "", produces = "application/hal+json")
+	public ResponseEntity<PagedModel<EntityModel<Physician>>> getPhysicians(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "5") int size,
+		@RequestParam(defaultValue = "ASC") Sort.Direction direction,
+		@RequestParam(defaultValue = "id") String field
+	)
+	{
+		final Page<Physician> physicians = service.findAll(page, size, direction, field);
+		final PagedModel<EntityModel<Physician>> pagedModel = resourcesAssembler.toModel(physicians, modelAssembler);
+		return ResponseEntity.status(200).body(pagedModel);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "search physicians")
-    @GetMapping(value = "/search", produces = "application/hal+json")
-    public ResponseEntity<PagedModel<EntityModel<Physician>>> searchPhysicians(
-            @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-            @RequestParam(defaultValue = "id") String field
-    ) {
-        final Page<Physician> physicians = service.findPhysicianByNameLikeOrSpecialtyLike(search, page, size, direction, field);
-        final PagedModel<EntityModel<Physician>> pagedModel = resourcesAssembler.toModel(physicians, modelAssembler);
-        return ResponseEntity.status(200).body(pagedModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "search physicians")
+	@GetMapping(value = "/search", produces = "application/hal+json")
+	public ResponseEntity<PagedModel<EntityModel<Physician>>> searchPhysicians(
+		@RequestParam(defaultValue = "") String search,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "5") int size,
+		@RequestParam(defaultValue = "ASC") Sort.Direction direction,
+		@RequestParam(defaultValue = "id") String field
+	)
+	{
+		final Page<Physician> physicians = service.findPhysicianByNameLikeOrSpecialtyLike(search, page, size, direction, field);
+		final PagedModel<EntityModel<Physician>> pagedModel = resourcesAssembler.toModel(physicians, modelAssembler);
+		return ResponseEntity.status(200).body(pagedModel);
+	}
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "get physician by id")
-    @GetMapping(value = "/{id}", produces = "application/hal+json")
-    public ResponseEntity<PhysicianModel> getPhysicianById(@PathVariable("id") Long id) {
-        final Link self = linkTo(methodOn(controller).getPhysicianById(id)).withSelfRel();
-        final Physician physician = service.getPhysician(id);
-        final PhysicianModel physicianModel = converter.toModel(physician);
-        physicianModel.add(self, aggregateRoot);
-        return ResponseEntity.status(200).body(physicianModel);
-    }
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "get physician by id")
+	@GetMapping(value = "/{id}", produces = "application/hal+json")
+	public ResponseEntity<PhysicianModel> getPhysicianById(@PathVariable("id") Long id)
+	{
+		final Link self = linkTo(methodOn(controller).getPhysicianById(id)).withSelfRel();
+		final Physician physician = service.getPhysician(id);
+		final PhysicianModel physicianModel = converter.toModel(physician);
+		physicianModel.add(self, aggregateRoot);
+		return ResponseEntity.status(200).body(physicianModel);
+	}
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "save physician")
-    @PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
-    public ResponseEntity<PhysicianModel> savePhysician(@RequestBody Physician physician) {
-        final Physician savedPhysician = service.savePhysician(physician);
-        final Link self = linkTo(methodOn(controller).getPhysicianById(savedPhysician.getId())).withSelfRel();
-        final PhysicianModel physicianModel = converter.toModel(savedPhysician);
-        physicianModel.add(self, aggregateRoot);
-        final URI uri = physicianModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
-        return ResponseEntity.status(201).location(uri).body(physicianModel);
-    }
+	@ResponseStatus(HttpStatus.CREATED)
+	@Operation(summary = "save physician")
+	@PostMapping(value = "", produces = "application/hal+json", consumes = "application/json")
+	public ResponseEntity<PhysicianModel> savePhysician(@RequestBody Physician physician)
+	{
+		final Physician savedPhysician = service.savePhysician(physician);
+		final Link self = linkTo(methodOn(controller).getPhysicianById(savedPhysician.getId())).withSelfRel();
+		final PhysicianModel physicianModel = converter.toModel(savedPhysician);
+		physicianModel.add(self, aggregateRoot);
+		final URI uri = physicianModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
+		return ResponseEntity.status(201).location(uri).body(physicianModel);
+	}
 }

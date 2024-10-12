@@ -17,28 +17,33 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EmployeeServiceImpl implements EmployeeService {
+public class EmployeeServiceImpl implements EmployeeService
+{
 
-    private final EmployeeRepository repository;
+	private final EmployeeRepository repository;
 
-    @Override
-    public Employee findEmployeeByUsername(String username) {
-        return repository.findEmployeeByUsername(username);
-    }
+	@Override
+	public Employee findEmployeeByUsername(String username)
+	{
+		return repository.findEmployeeByUsername(username);
+	}
 
-    @Override
-    public void saveEmployee(Employee employee) {
-        repository.saveEmployee(employee);
-    }
+	@Override
+	public void saveEmployee(Employee employee)
+	{
+		repository.saveEmployee(employee);
+	}
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final Employee employee = repository.findEmployeeByUsername(username);
-        return new org.springframework.security.core.userdetails
-                .User(employee.getUsername(), employee.getPassword(), mapRolesToPermissions(employee.getRoles()));
-    }
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+	{
+		final Employee employee = repository.findEmployeeByUsername(username);
+		return new org.springframework.security.core.userdetails
+			.User(employee.getUsername(), employee.getPassword(), mapRolesToPermissions(employee.getRoles()));
+	}
 
-    private Collection<? extends GrantedAuthority> mapRolesToPermissions(Collection<EmployeeRole> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
-    }
+	private Collection<? extends GrantedAuthority> mapRolesToPermissions(Collection<EmployeeRole> roles)
+	{
+		return roles.stream().map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
+	}
 }

@@ -4,13 +4,14 @@ import augusto108.ces.appointmenttracker.model.entities.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
-public interface PatientService {
+public interface PatientService
+{
 
-    Page<Patient> findAll(int page, int size, Sort.Direction direction, String field);
+	Page<Patient> findAll(int page, int size, Sort.Direction direction, String field);
 
-    Patient getPatient(Long id);
+	Patient getPatient(Long id);
 
-    Patient savePatient(Patient patient);
+	Patient savePatient(Patient patient);
 
-    Page<Patient> findPatientByNameLikeOrEmailLike(String search, int page, int size, Sort.Direction direction, String field);
+	Page<Patient> findPatientByNameLikeOrEmailLike(String search, int page, int size, Sort.Direction direction, String field);
 }

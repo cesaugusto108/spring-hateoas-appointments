@@ -9,20 +9,23 @@ import javax.persistence.EntityManager;
 
 @Repository
 @RequiredArgsConstructor
-public class EmployeeRoleRepositoryImpl implements EmployeeRoleRepository {
+public class EmployeeRoleRepositoryImpl implements EmployeeRoleRepository
+{
 
-    private final EntityManager entityManager;
+	private final EntityManager entityManager;
 
-    @Override
-    public EmployeeRole getEmployeeRolebyRole(Role role) {
-        return entityManager
-                .createQuery("from EmployeeRole e where e.role = :role", EmployeeRole.class)
-                .setParameter("role", role)
-                .getSingleResult();
-    }
+	@Override
+	public EmployeeRole getEmployeeRolebyRole(Role role)
+	{
+		return entityManager
+			.createQuery("from EmployeeRole e where e.role = :role", EmployeeRole.class)
+			.setParameter("role", role)
+			.getSingleResult();
+	}
 
-    @Override
-    public void saveEmployeeRole(EmployeeRole employeeRole) {
-        entityManager.persist(employeeRole);
-    }
+	@Override
+	public void saveEmployeeRole(EmployeeRole employeeRole)
+	{
+		entityManager.persist(employeeRole);
+	}
 }

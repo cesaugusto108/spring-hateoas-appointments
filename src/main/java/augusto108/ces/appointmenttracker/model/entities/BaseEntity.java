@@ -10,11 +10,12 @@ import javax.persistence.*;
 @Setter
 @EqualsAndHashCode(of = "id")
 @MappedSuperclass
-public abstract class BaseEntity {
+public abstract class BaseEntity
+{
 
-    @Id
-    @SequenceGenerator(name = "seq_generator", initialValue = 101, allocationSize = 1)
-    @GeneratedValue(generator = "seq_generator", strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false, unique = true)
-    private Long id;
+	@Id
+	@SequenceGenerator(name = "seq_generator", initialValue = 101, allocationSize = 1)
+	@GeneratedValue(generator = "seq_generator", strategy = GenerationType.SEQUENCE)
+	@Column(name = "id", nullable = false, unique = true)
+	private Long id;
 }

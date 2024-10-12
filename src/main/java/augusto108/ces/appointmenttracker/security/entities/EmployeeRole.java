@@ -12,14 +12,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_role")
-public final class EmployeeRole extends SecurityBaseEntity {
+public final class EmployeeRole extends SecurityBaseEntity
+{
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, unique = true, length = 50)
-    private Role role;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role", nullable = false, unique = true, length = 50)
+	private Role role;
 
-    @Override
-    public String toString() {
-        return role.toString();
-    }
+	@Override
+	public String toString()
+	{
+		return role.toString();
+	}
 }

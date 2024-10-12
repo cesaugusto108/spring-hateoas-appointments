@@ -2,9 +2,10 @@ package augusto108.ces.appointmenttracker.repositories;
 
 import augusto108.ces.appointmenttracker.security.entities.Employee;
 
-public interface EmployeeRepository {
+public interface EmployeeRepository
+{
 
-    Employee findEmployeeByUsername(String username);
+	Employee findEmployeeByUsername(String username);
 
-    void saveEmployee(Employee employee);
+	void saveEmployee(Employee employee);
 }

@@ -8,16 +8,19 @@ import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSuppor
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppointmentModelConverter extends RepresentationModelAssemblerSupport<Appointment, AppointmentModel> {
+public class AppointmentModelConverter extends RepresentationModelAssemblerSupport<Appointment, AppointmentModel>
+{
 
-    public AppointmentModelConverter() {
-        super(AppointmentController.class, AppointmentModel.class);
-    }
+	public AppointmentModelConverter()
+	{
+		super(AppointmentController.class, AppointmentModel.class);
+	}
 
-    @Override
-    public AppointmentModel toModel(Appointment appointment) {
-        final AppointmentModel appointmentModel = new AppointmentModel();
-        BeanUtils.copyProperties(appointment, appointmentModel);
-        return appointmentModel;
-    }
+	@Override
+	public AppointmentModel toModel(Appointment appointment)
+	{
+		final AppointmentModel appointmentModel = new AppointmentModel();
+		BeanUtils.copyProperties(appointment, appointmentModel);
+		return appointmentModel;
+	}
 }

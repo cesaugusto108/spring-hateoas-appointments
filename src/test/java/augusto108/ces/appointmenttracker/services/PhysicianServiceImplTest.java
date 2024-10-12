@@ -20,78 +20,85 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 @Transactional
 @DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
-class PhysicianServiceImplTest {
+class PhysicianServiceImplTest
+{
 
-    private final PhysicianService physicianService;
+	private final PhysicianService physicianService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    @Autowired
-    PhysicianServiceImplTest(PhysicianService physicianService) {
-        this.physicianService = physicianService;
-    }
+	@Autowired PhysicianServiceImplTest(PhysicianService physicianService)
+	{
+		this.physicianService = physicianService;
+	}
 
-    @BeforeEach
-    void setUp() {
-        final String query1 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
-                "    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
+	@BeforeEach
+	void setUp()
+	{
+		final String query1 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+			"    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
 
-        final String query2 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
-                "    VALUES (2, 'João', 'Cavalcante', 'DERMATOLOGIST');";
+		final String query2 = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+			"    VALUES (2, 'João', 'Cavalcante', 'DERMATOLOGIST');";
 
-        entityManager.createNativeQuery(query1).executeUpdate();
-        entityManager.createNativeQuery(query2).executeUpdate();
-    }
+		entityManager.createNativeQuery(query1).executeUpdate();
+		entityManager.createNativeQuery(query2).executeUpdate();
+	}
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("delete from `tb_physician`;").executeUpdate();
-    }
+	@AfterEach
+	void tearDown()
+	{
+		entityManager.createNativeQuery("delete from `tb_physician`;").executeUpdate();
+	}
 
-    @Test
-    void findAll() {
-        final Page<Physician> physicians = physicianService.findAll(0, 10, Sort.Direction.ASC, "id");
-        assertEquals(2, physicians.getTotalElements());
-        assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physicians.get().toList().get(0).toString());
-    }
+	@Test
+	void findAll()
+	{
+		final Page<Physician> physicians = physicianService.findAll(0, 10, Sort.Direction.ASC, "id");
+		assertEquals(2, physicians.getTotalElements());
+		assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physicians.get().toList().get(0).toString());
+	}
 
-    @Test
-    void getPhysician() {
-        final Physician physician = physicianService.getPhysician(1L);
-        assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physician.toString());
-    }
+	@Test
+	void getPhysician()
+	{
+		final Physician physician = physicianService.getPhysician(1L);
+		assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physician.toString());
+	}
 
-    @Test
-    void savePhysician() {
-        final Physician physician = new Physician();
-        physician.setFirstName("Mardoqueu");
-        physician.setLastName("Santos");
-        physician.setSpecialty(Specialty.PSYCHIATRIST);
+	@Test
+	void savePhysician()
+	{
+		final Physician physician = new Physician();
+		physician.setFirstName("Mardoqueu");
+		physician.setLastName("Santos");
+		physician.setSpecialty(Specialty.PSYCHIATRIST);
 
-        physicianService.savePhysician(physician);
+		physicianService.savePhysician(physician);
 
-        final List<Physician> physicians = entityManager
-                .createQuery("from Physician order by id", Physician.class)
-                .getResultList();
+		final List<Physician> physicians = entityManager
+			.createQuery("from Physician order by id", Physician.class)
+			.getResultList();
 
-        assertEquals(3, physicians.size());
-        assertEquals("Mardoqueu Santos (PSYCHIATRIST)", physicians.get(2).toString());
-    }
+		assertEquals(3, physicians.size());
+		assertEquals("Mardoqueu Santos (PSYCHIATRIST)", physicians.get(2).toString());
+	}
 
-    @Test
-    void findPhysicianByNameLikeOrSpecialtyLike() {
-        final Page<Physician> physiciansByName = physicianService
-                .findPhysicianByNameLikeOrSpecialtyLike("Cavalcante", 0, 10, Sort.Direction.ASC, "id");
+	@Test
+	void findPhysicianByNameLikeOrSpecialtyLike()
+	{
+		final Page<Physician> physiciansByName = physicianService
+			.findPhysicianByNameLikeOrSpecialtyLike("Cavalcante", 0, 10, Sort.Direction.ASC, "id");
 
-        assertEquals(2, physiciansByName.getTotalElements());
-        assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physiciansByName.get().toList().get(0).toString());
-        assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansByName.get().toList().get(1).toString());
+		assertEquals(2, physiciansByName.getTotalElements());
+		assertEquals("Marcela Cavalcante (GENERAL_PRACTITIONER)", physiciansByName.get().toList().get(0).toString());
+		assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansByName.get().toList().get(1).toString());
 
-        final Page<Physician> physiciansBySpecialty = physicianService
-                .findPhysicianByNameLikeOrSpecialtyLike("DERMATOLOGIST", 0, 10, Sort.Direction.DESC, "firstName");
+		final Page<Physician> physiciansBySpecialty = physicianService
+			.findPhysicianByNameLikeOrSpecialtyLike("DERMATOLOGIST", 0, 10, Sort.Direction.DESC, "firstName");
 
-        assertEquals(1, physiciansBySpecialty.getTotalElements());
-        assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansBySpecialty.get().toList().get(0).toString());
-    }
+		assertEquals(1, physiciansBySpecialty.getTotalElements());
+		assertEquals("João Cavalcante (DERMATOLOGIST)", physiciansBySpecialty.get().toList().get(0).toString());
+	}
 }

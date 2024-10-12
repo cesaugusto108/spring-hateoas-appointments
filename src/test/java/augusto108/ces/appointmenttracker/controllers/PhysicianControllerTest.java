@@ -33,121 +33,126 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("sec")
 @Transactional
-class PhysicianControllerTest extends AuthorizeAdminUser {
+class PhysicianControllerTest extends AuthorizeAdminUser
+{
 
-    private MockMvc mockMvc;
+	private final WebApplicationContext context;
+	private final ObjectMapper objectMapper;
+	private final Filter springSecurityFilterChain;
+	private MockMvc mockMvc;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    private final WebApplicationContext context;
-    private final ObjectMapper objectMapper;
-    private final Filter springSecurityFilterChain;
+	@Autowired PhysicianControllerTest(WebApplicationContext context,
+																		 ObjectMapper objectMapper,
+																		 Filter springSecurityFilterChain,
+																		 EmployeeService employeeService)
+	{
+		super(employeeService);
+		this.context = context;
+		this.objectMapper = objectMapper;
+		this.springSecurityFilterChain = springSecurityFilterChain;
+	}
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@BeforeEach
+	void setUp()
+	{
+		mockMvc = MockMvcBuilders
+			.webAppContextSetup(context)
+			.addFilters(springSecurityFilterChain)
+			.build();
 
-    @Autowired
-    PhysicianControllerTest(WebApplicationContext context,
-                            ObjectMapper objectMapper,
-                            Filter springSecurityFilterChain,
-                            EmployeeService employeeService) {
-        super(employeeService);
-        this.context = context;
-        this.objectMapper = objectMapper;
-        this.springSecurityFilterChain = springSecurityFilterChain;
-    }
+		final String query = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
+			"    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .addFilters(springSecurityFilterChain)
-                .build();
+		entityManager.createNativeQuery(query).executeUpdate();
+	}
 
-        final String query = "INSERT INTO `tb_physician` (`id`, `first_name`, `last_name`, `specialty`)\n" +
-                "    VALUES (1, 'Marcela', 'Cavalcante', 'GENERAL_PRACTITIONER');";
+	@AfterEach
+	void tearDown()
+	{
+		entityManager.createNativeQuery("delete from `tb_physician`;");
+	}
 
-        entityManager.createNativeQuery(query).executeUpdate();
-    }
+	@Test
+	void getPhysicians() throws Exception
+	{
+		final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/physicians?page=0&size=20&sort=id,asc";
 
-    @AfterEach
-    void tearDown() {
-        entityManager.createNativeQuery("delete from `tb_physician`;");
-    }
+		MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
+				.param("page", "0")
+				.param("size", "20")
+				.param("direction", "ASC")
+				.param("field", "id"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.page.size", is(20)))
+			.andExpect(jsonPath("$.page.totalElements", is(1)))
+			.andExpect(jsonPath("$.page.totalPages", is(1)))
+			.andExpect(jsonPath("$.page.number", is(0)))
+			.andExpect(jsonPath("$._links.self.href", is(selfLink)))
+			.andReturn();
 
-    @Test
-    void getPhysicians() throws Exception {
-        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/physicians?page=0&size=20&sort=id,asc";
+		final String content = result.getResponse().getContentAsString();
+		final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
+		assertEquals(3, pageJsonKeySetSize);
+	}
 
-        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
-                        .param("page", "0")
-                        .param("size", "20")
-                        .param("direction", "ASC")
-                        .param("field", "id"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$.page.totalPages", is(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._links.self.href", is(selfLink)))
-                .andReturn();
+	@Test
+	void searchPhysicians() throws Exception
+	{
+		final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/physicians/search?page=0&size=20&sort=id,asc";
 
-        final String content = result.getResponse().getContentAsString();
-        final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-        assertEquals(3, pageJsonKeySetSize);
-    }
+		MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/search").with(makeAuthorizedAdminUser())
+				.param("search", "Marcela")
+				.param("page", "0")
+				.param("size", "20")
+				.param("direction", "ASC")
+				.param("field", "id"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.page.totalElements", is(1)))
+			.andExpect(jsonPath("$._embedded.physicianList", hasSize(1)))
+			.andExpect(jsonPath("$._links.self.href", is(selfLink)))
+			.andReturn();
 
-    @Test
-    void searchPhysicians() throws Exception {
-        final String selfLink = "http://localhost" + VersioningConstant.VERSION + "/physicians/search?page=0&size=20&sort=id,asc";
+		final String content = result.getResponse().getContentAsString();
+		final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
+		assertEquals(3, pageJsonKeySetSize);
+	}
 
-        MvcResult result = mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/search").with(makeAuthorizedAdminUser())
-                        .param("search", "Marcela")
-                        .param("page", "0")
-                        .param("size", "20")
-                        .param("direction", "ASC")
-                        .param("field", "id"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-                .andExpect(jsonPath("$._embedded.physicianList", hasSize(1)))
-                .andExpect(jsonPath("$._links.self.href", is(selfLink)))
-                .andReturn();
+	@Test
+	void getPhysicianById() throws Exception
+	{
+		mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/{id}", 1).with(makeAuthorizedAdminUser()))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$.firstName", is("Marcela")))
+			.andExpect(jsonPath("$.lastName", is("Cavalcante")))
+			.andExpect(jsonPath("$.specialty", is("GENERAL_PRACTITIONER")));
+	}
 
-        final String content = result.getResponse().getContentAsString();
-        final int pageJsonKeySetSize = objectMapper.readValue(content, LinkedHashMap.class).keySet().size();
-        assertEquals(3, pageJsonKeySetSize);
-    }
+	@Test
+	void savePhysician() throws Exception
+	{
+		final Physician physician = new Physician();
+		physician.setFirstName("Nelson");
+		physician.setLastName("Muntz");
+		physician.setSpecialty(Specialty.ENDOCRINOLOGIST);
 
-    @Test
-    void getPhysicianById() throws Exception {
-        mockMvc.perform(get(VersioningConstant.VERSION + "/physicians/{id}", 1).with(makeAuthorizedAdminUser()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$.firstName", is("Marcela")))
-                .andExpect(jsonPath("$.lastName", is("Cavalcante")))
-                .andExpect(jsonPath("$.specialty", is("GENERAL_PRACTITIONER")));
-    }
+		final MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(physician)))
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.firstName", is("Nelson")))
+			.andExpect(jsonPath("$.lastName", is("Muntz")))
+			.andExpect(jsonPath("$.specialty", is("ENDOCRINOLOGIST")))
+			.andReturn();
 
-    @Test
-    void savePhysician() throws Exception {
-        final Physician physician = new Physician();
-        physician.setFirstName("Nelson");
-        physician.setLastName("Muntz");
-        physician.setSpecialty(Specialty.ENDOCRINOLOGIST);
-
-        final MvcResult result = mockMvc.perform(post(VersioningConstant.VERSION + "/physicians").with(makeAuthorizedAdminUser())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(physician)))
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName", is("Nelson")))
-                .andExpect(jsonPath("$.lastName", is("Muntz")))
-                .andExpect(jsonPath("$.specialty", is("ENDOCRINOLOGIST")))
-                .andReturn();
-
-        final Physician savedPhysician = objectMapper.readerFor(Physician.class).readValue(result.getResponse().getContentAsString());
-        final String locationHeader = result.getResponse().getHeader("Location");
-        final String uri = "http://localhost" + VersioningConstant.VERSION + "/physicians/" + savedPhysician.getId();
-        assertEquals(uri, locationHeader);
-    }
+		final Physician savedPhysician = objectMapper.readerFor(Physician.class).readValue(result.getResponse().getContentAsString());
+		final String locationHeader = result.getResponse().getHeader("Location");
+		final String uri = "http://localhost" + VersioningConstant.VERSION + "/physicians/" + savedPhysician.getId();
+		assertEquals(uri, locationHeader);
+	}
 }

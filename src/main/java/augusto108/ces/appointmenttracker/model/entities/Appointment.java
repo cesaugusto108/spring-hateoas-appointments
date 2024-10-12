@@ -12,20 +12,22 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true, of = {})
 @Entity
 @Table(name = "tb_appointment")
-public class Appointment extends BaseEntity {
+public class Appointment extends BaseEntity
+{
 
-    @ManyToOne
-    private Patient patient;
+	@ManyToOne
+	private Patient patient;
 
-    @ManyToOne
-    private Physician physician;
+	@ManyToOne
+	private Physician physician;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "status")
-    private Status status;
+	@Enumerated(value = EnumType.STRING)
+	@Column(name = "status")
+	private Status status;
 
-    @Override
-    public String toString() {
-        return "Patient: " + patient.toString() + " | " + "Physician: " + physician.toString() + " | " + status.toString();
-    }
+	@Override
+	public String toString()
+	{
+		return "Patient: " + patient.toString() + " | " + "Physician: " + physician.toString() + " | " + status.toString();
+	}
 }

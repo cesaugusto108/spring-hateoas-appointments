@@ -24,33 +24,35 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping(VersioningConstant.VERSION + "/")
 @RequiredArgsConstructor
-public class AppController {
+public class AppController
+{
 
-    private final DefaultParameterObj param = new DefaultParameterObj();
+	private final DefaultParameterObj param = new DefaultParameterObj();
 
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "App root links")
-    @GetMapping(produces = "application/hal+json")
-    public ResponseEntity<List<Link>> appIndex() {
-        final int page = param.getPage();
-        final int size = param.getSize();
-        final Sort.Direction direction = param.getDirection();
-        final String field = param.getField();
+	@ResponseStatus(HttpStatus.OK)
+	@Operation(summary = "App root links")
+	@GetMapping(produces = "application/hal+json")
+	public ResponseEntity<List<Link>> appIndex()
+	{
+		final int page = param.getPage();
+		final int size = param.getSize();
+		final Sort.Direction direction = param.getDirection();
+		final String field = param.getField();
 
-        final Link self = linkTo(methodOn(AppController.class).appIndex()).withSelfRel();
+		final Link self = linkTo(methodOn(AppController.class).appIndex()).withSelfRel();
 
-        final Link appointments = linkTo(methodOn(AppointmentController.class)
-                .getAppointments(page, size, direction, field))
-                .withRel("appointments");
+		final Link appointments = linkTo(methodOn(AppointmentController.class)
+			.getAppointments(page, size, direction, field))
+			.withRel("appointments");
 
-        final Link patients = linkTo(methodOn(PatientController.class)
-                .getPatients(page, size, direction, field))
-                .withRel("patients");
+		final Link patients = linkTo(methodOn(PatientController.class)
+			.getPatients(page, size, direction, field))
+			.withRel("patients");
 
-        final Link physicians = linkTo(methodOn(PhysicianController.class)
-                .getPhysicians(page, size, direction, field))
-                .withRel("physicians");
+		final Link physicians = linkTo(methodOn(PhysicianController.class)
+			.getPhysicians(page, size, direction, field))
+			.withRel("physicians");
 
-        return ResponseEntity.status(200).body(Arrays.asList(self, appointments, patients, physicians));
-    }
+		return ResponseEntity.status(200).body(Arrays.asList(self, appointments, patients, physicians));
+	}
 }

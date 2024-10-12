@@ -13,13 +13,14 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, of = {})
-public class PatientModel extends RepresentationModel<PatientModel> {
+public class PatientModel extends RepresentationModel<PatientModel>
+{
 
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
+	private Long id;
+	private String firstName;
+	private String lastName;
+	private String email;
 
-    @JsonIgnoreProperties("patient")
-    private Set<Appointment> appointments = new HashSet<>();
+	@JsonIgnoreProperties("patient")
+	private Set<Appointment> appointments = new HashSet<>();
 }

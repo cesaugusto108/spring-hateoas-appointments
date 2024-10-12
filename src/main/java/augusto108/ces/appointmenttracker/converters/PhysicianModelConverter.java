@@ -8,16 +8,19 @@ import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSuppor
 import org.springframework.stereotype.Component;
 
 @Component
-public class PhysicianModelConverter extends RepresentationModelAssemblerSupport<Physician, PhysicianModel> {
+public class PhysicianModelConverter extends RepresentationModelAssemblerSupport<Physician, PhysicianModel>
+{
 
-    public PhysicianModelConverter() {
-        super(PhysicianController.class, PhysicianModel.class);
-    }
+	public PhysicianModelConverter()
+	{
+		super(PhysicianController.class, PhysicianModel.class);
+	}
 
-    @Override
-    public PhysicianModel toModel(Physician entity) {
-        final PhysicianModel physicianModel = new PhysicianModel();
-        BeanUtils.copyProperties(entity, physicianModel);
-        return physicianModel;
-    }
+	@Override
+	public PhysicianModel toModel(Physician entity)
+	{
+		final PhysicianModel physicianModel = new PhysicianModel();
+		BeanUtils.copyProperties(entity, physicianModel);
+		return physicianModel;
+	}
 }

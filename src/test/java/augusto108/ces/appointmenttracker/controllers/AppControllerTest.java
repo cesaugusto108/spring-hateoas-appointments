@@ -18,28 +18,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
-class AppControllerTest {
+class AppControllerTest
+{
 
-    private MockMvc mockMvc;
+	private final WebApplicationContext context;
+	private MockMvc mockMvc;
 
-    private final WebApplicationContext context;
+	@Autowired AppControllerTest(WebApplicationContext context)
+	{
+		this.context = context;
+	}
 
-    @Autowired
-    AppControllerTest(WebApplicationContext context) {
-        this.context = context;
-    }
+	@BeforeEach
+	void setUp()
+	{
+		mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(SecurityMockMvcConfigurers.springSecurity()).build();
+	}
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(SecurityMockMvcConfigurers.springSecurity()).build();
-    }
-
-    @WithMockUser
-    @Test
-    void appIndex() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(VersioningConstant.VERSION + "/"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json"))
-                .andExpect(jsonPath("$", hasSize(4)));
-    }
+	@WithMockUser
+	@Test
+	void appIndex() throws Exception
+	{
+		mockMvc.perform(MockMvcRequestBuilders.get(VersioningConstant.VERSION + "/"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType("application/hal+json"))
+			.andExpect(jsonPath("$", hasSize(4)));
+	}
 }

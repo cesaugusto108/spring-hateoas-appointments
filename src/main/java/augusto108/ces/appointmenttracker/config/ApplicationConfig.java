@@ -6,10 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.PagedResourcesAssembler;
 
 @Configuration
-public class ApplicationConfig {
+public class ApplicationConfig
+{
 
-    @Bean(name = "configPagedResourcesAssemblerBean")
-    public PagedResourcesAssembler<? extends BaseEntity> pagedResourcesAssembler() {
-        return new PagedResourcesAssembler<>(null, null);
-    }
+	@Bean(name = "configPagedResourcesAssemblerBean")
+	public PagedResourcesAssembler<? extends BaseEntity> pagedResourcesAssembler()
+	{
+		return new PagedResourcesAssembler<>(null, null);
+	}
 }

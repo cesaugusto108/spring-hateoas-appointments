@@ -8,20 +8,23 @@ import javax.persistence.EntityManager;
 
 @Repository
 @RequiredArgsConstructor
-public class EmployeeRepositoryImpl implements EmployeeRepository {
+public class EmployeeRepositoryImpl implements EmployeeRepository
+{
 
-    private final EntityManager entityManager;
+	private final EntityManager entityManager;
 
-    @Override
-    public Employee findEmployeeByUsername(String username) {
-        return entityManager
-                .createQuery("from Employee e where e.username = :username", Employee.class)
-                .setParameter("username", username)
-                .getSingleResult();
-    }
+	@Override
+	public Employee findEmployeeByUsername(String username)
+	{
+		return entityManager
+			.createQuery("from Employee e where e.username = :username", Employee.class)
+			.setParameter("username", username)
+			.getSingleResult();
+	}
 
-    @Override
-    public void saveEmployee(Employee employee) {
-        entityManager.persist(employee);
-    }
+	@Override
+	public void saveEmployee(Employee employee)
+	{
+		entityManager.persist(employee);
+	}
 }
